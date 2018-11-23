@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  db:
+    extends:
+      file: mysql.yml
+      service: db
