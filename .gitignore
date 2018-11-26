@@ -1,8 +1,8 @@
 # DOCKER
 
 docker/bdd
-
-
+.idea/
+test-results.txt
 
 
 
