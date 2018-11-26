@@ -1,5 +1,9 @@
 ## ALFRED BRAIN
 
+### Config Specification
+
+You can find an example of the `config.json` file which will be return by the object in `config.spec.json`
+
 __Project Setup__
 ```
 git clone
