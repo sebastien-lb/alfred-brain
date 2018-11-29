@@ -18,12 +18,16 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 
-from object_collector.views import SmartObjectViewSet
+from object_collector.views import *
 from .views import login
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'smartObject', SmartObjectViewSet)
+router.register(r'action', ActionViewSet)
+router.register(r'dataType', DataTypeViewSet)
+router.register(r'dataSourceType', DataSourceTypeViewSet)
+router.register(r'DataSource', DataSourceViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -29,4 +29,39 @@ class SmartObject(models.Model):
         verbose_name_plural = "SmartObjects"
 
 
- 
+class Action(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=(30))
+    command = models.CharField(max_length=(100))
+    smart_object = models.ForeignKey(SmartObject, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "Actions"
+
+
+class DataType(models.Model):
+    name = models.CharField(primary_key=True, max_length=(50))
+
+    class Meta:
+        verbose_name_plural = "DataTypes"
+
+
+class DataSourceType(models.Model):
+    name = models.CharField(primary_key=True, max_length=(50))
+
+    class Meta:
+        verbose_name_plural = "DataSourceTypes"
+
+
+class DataSource(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=(50), default='')
+    description = models.CharField(max_length=(500))
+    data_type = models.ForeignKey(DataType, on_delete=models.CASCADE)
+    endpoint = models.CharField(max_length=(200))
+    data_source_type = models.ForeignKey(DataSourceType, on_delete=models.CASCADE)
+    smart_object = models.ForeignKey(SmartObject, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "DataSources"
+
