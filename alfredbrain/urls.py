@@ -32,6 +32,7 @@ router.register(r'DataSource', DataSourceViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', login),
+    path('registerDevice/', RegisterSmartObject.as_view()),
     url(r'^', include(router.urls)),
 
     # url(r'^api-auth/', include('rest_framework.urls'))
