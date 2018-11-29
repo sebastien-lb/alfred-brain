@@ -19,6 +19,7 @@ from django.conf.urls import url, include
 from rest_framework import routers
 
 from object_collector.views import SmartObjectViewSet
+from .views import login
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
@@ -26,6 +27,8 @@ router.register(r'smartObject', SmartObjectViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/login', login),
     url(r'^', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls'))
+
+    # url(r'^api-auth/', include('rest_framework.urls'))
 ]
