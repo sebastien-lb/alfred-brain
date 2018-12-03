@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import SmartObject, Action, DataType, DataSourceType, DataSource 
+
+from .models import Action, CategoryType, DataPoint, DataPollingType, DataSource, DataType, PerformedAction, SmartObject
 
 # Serializers define the API representation.
 class SmartObjectSerializer(serializers.ModelSerializer):
@@ -7,27 +8,40 @@ class SmartObjectSerializer(serializers.ModelSerializer):
         model = SmartObject
         fields = ('name','address_ip','port','id')
 
-
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ('name', 'command', 'smart_object','id')
+        fields = ('name', 'command', 'payload', 'smart_object','id')
 
+class DataPointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataPoint
+        fields = ('id','value','data_source','timestamp')
+
+class PerformedActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PerformedAction
+        fields = ('id','action','timestamp')
+
+class DataSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataSource
+        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'entrypoint', 'data_polling_type', 'smart_object')
+
+# reference types
 
 class DataTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataType
         fields = ('name',)
 
-
-class DataSourceTypeSerializer(serializers.ModelSerializer):
+class DataPollingTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DataSourceType
+        model = DataPollingType
         fields = ('name',)
 
-
-class DataSourceSerializer(serializers.ModelSerializer):
+class CategoryTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DataSource
-        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'data_source_type', 'smart_object')
+        model = CategoryType
+        fields = ('name',)
 

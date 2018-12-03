@@ -17,13 +17,25 @@ class DataTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataType.objects.all()
     serializer_class = DataTypeSerializer
 
-class DataSourceTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DataSourceType.objects.all()
-    serializer_class = DataSourceTypeSerializer
+class DataPollingTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DataPollingType.objects.all()
+    serializer_class = DataPollingTypeSerializer
 
 class DataSourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataSource.objects.all()
     serializer_class = DataSourceSerializer
+
+class PerformedActionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = PerformedAction.objects.all()
+    serializer_class = PerformedActionSerializer
+
+class DataPointsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = DataPoint.objects.all()
+    serializer_class = DataPointSerializer
+
+class CategoryTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = CategoryType.objects.all()
+    serializer_class = CategoryTypeSerializer
 
 class RegisterSmartObject(APIView):
     def get(self, request, format=None):

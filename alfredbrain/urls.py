@@ -26,8 +26,11 @@ router = routers.DefaultRouter()
 router.register(r'smartObject', SmartObjectViewSet)
 router.register(r'action', ActionViewSet)
 router.register(r'dataType', DataTypeViewSet)
-router.register(r'dataSourceType', DataSourceTypeViewSet)
-router.register(r'DataSource', DataSourceViewSet)
+router.register(r'dataPollingType', DataPollingTypeViewSet)
+router.register(r'dataSource', DataSourceViewSet)
+router.register(r'performedActions', PerformedActionViewSet)
+router.register(r'dataPoints', DataPointsViewSet)
+router.register(r'categoryType', CategoryTypeViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from .models import SmartObject, Action, DataSource, DataType, DataSourceType
+from .models import SmartObject, Action, DataSource, DataType, DataPollingType, CategoryType
 
 
 # Create your tests here.
@@ -43,30 +43,36 @@ class DataTypeTestCase(TestCase):
         self.assertEqual(dataType.name, "dataType_test")
 
 
-class DataSourceTypeTestCase(TestCase):
+class DataPollingTypeTestCase(TestCase):
     def test_object_created(self):
-        DataSourceType.objects.create(name="dataSourceType_test")
-        dataSourceType = DataSourceType.objects.get(name="dataSourceType_test")
+        DataPollingType.objects.create(name="dataPollingType_test")
+        dataPollingType = DataPollingType.objects.get(name="dataPollingType_test")
 
-        self.assertEqual(dataSourceType.name, "dataSourceType_test")
+        self.assertEqual(dataPollingType.name, "dataPollingType_test")
 
+class CategoryTypeTestCase(TestCase):
+    def test_object_created(self):
+        CategoryType.objects.create(name="categoryType_test")
+        categoryType = CategoryType.objects.get(name="categoryType_test")
+
+        self.assertEqual(categoryType.name, "categoryType_test")
 
 class DataSourceTestCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
         DataType.objects.create(name="dataType_test")
-        DataSourceType.objects.create(name="dataSourceType_test")
+        DataPollingType.objects.create(name="dataPollingType_test")
 
         device = SmartObject.objects.get(name="device_test")
         dataType = DataType.objects.get(name="dataType_test")
-        dataSourceType = DataSourceType.objects.get(name="dataSourceType_test")
+        dataPollingType = DataPollingType.objects.get(name="dataPollingType_test")
 
         DataSource.objects.create(
             name="datasource_test",
             description="test of datasource object creation",
             data_type=dataType,
             endpoint="/temperature",
-            data_source_type=dataSourceType,
+            data_polling_type=dataPollingType,
             smart_object=device
         )
 
@@ -83,5 +89,5 @@ class DataSourceTestCase(TestCase):
         dataType = DataType.objects.get(name="dataType_test")
         self.assertEqual(dataSource.data_type, dataType)
 
-        dataSourceType = DataSourceType.objects.get(name="dataSourceType_test")
-        self.assertEqual(dataSource.data_source_type, dataSourceType)
+        dataPollingType = DataPollingType.objects.get(name="dataPollingType_test")
+        self.assertEqual(dataSource.data_polling_type, dataPollingType)
