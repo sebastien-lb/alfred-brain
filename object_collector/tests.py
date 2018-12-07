@@ -2,9 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from .models import SmartObject, Action, DataSource, DataType, DataPollingType, CategoryType
 
-
-# Create your tests here.
-class SmartObjectTestCase(TestCase):
+class TestSmartObjectCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
 
@@ -22,7 +20,7 @@ class SmartObjectTestCase(TestCase):
         self.assertRaises(ValidationError, smart_object.full_clean)
 
 
-class ActionTestCase(TestCase):
+class TestActionCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
         device_test = SmartObject.objects.get(name="device_test")
@@ -35,7 +33,7 @@ class ActionTestCase(TestCase):
         self.assertEqual(action.smart_object, device_test)
 
 
-class DataTypeTestCase(TestCase):
+class TestDataTypeCase(TestCase):
     def test_object_created(self):
         DataType.objects.create(name="dataType_test")
         dataType = DataType.objects.get(name="dataType_test")
@@ -43,21 +41,21 @@ class DataTypeTestCase(TestCase):
         self.assertEqual(dataType.name, "dataType_test")
 
 
-class DataPollingTypeTestCase(TestCase):
+class TestDataPollingTypeCase(TestCase):
     def test_object_created(self):
         DataPollingType.objects.create(name="dataPollingType_test")
         dataPollingType = DataPollingType.objects.get(name="dataPollingType_test")
 
         self.assertEqual(dataPollingType.name, "dataPollingType_test")
 
-class CategoryTypeTestCase(TestCase):
+class TestCategoryTypeCase(TestCase):
     def test_object_created(self):
         CategoryType.objects.create(name="categoryType_test")
         categoryType = CategoryType.objects.get(name="categoryType_test")
 
         self.assertEqual(categoryType.name, "categoryType_test")
 
-class DataSourceTestCase(TestCase):
+class TestDataSourceCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
         DataType.objects.create(name="dataType_test")

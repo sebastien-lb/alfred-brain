@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'object_collector'
+    'object_collector',
+    'django_nose',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,13 @@ STATIC_URL = '/static/'
 
 # CORS HEADER 
 CORS_ORIGIN_ALLOW_ALL = True   
+
+
+# Use django nose to run tests
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+# Specify coverage and packages
+NOSE_ARGS = [
+'--cover-erase', 
+'--cover-package=object_collector,object_collector.models',
+]
