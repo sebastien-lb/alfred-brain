@@ -16,10 +16,10 @@
         {
             "name": "data_source_name <temperature>",
             "description": "description_of_the_data <return temperature of the room>",
-            "type": "number",
+            "data-type": "number",
             "unit": "celsius",
             "endpoint": "endpoint_to_query_to_get_data /temperature",
-            "data-source-type": " <ON_REQUEST | NOTIFICATION >"
+            "data-polling-type": " <ON_REQUEST | NOTIFICATION >"
         }
     ]
 }
