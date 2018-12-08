@@ -13,44 +13,52 @@ class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SmartObject.objects.all()
     serializer_class = SmartObjectSerializer
 
+
 class ActionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Action.objects.all()
     serializer_class = ActionSerializer
+
 
 class DataTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataType.objects.all()
     serializer_class = DataTypeSerializer
 
+
 class DataPollingTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataPollingType.objects.all()
     serializer_class = DataPollingTypeSerializer
+
 
 class DataSourceViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataSource.objects.all()
     serializer_class = DataSourceSerializer
 
+
 class PerformedActionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PerformedAction.objects.all()
     serializer_class = PerformedActionSerializer
+
 
 class DataPointsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = DataPoint.objects.all()
     serializer_class = DataPointSerializer
 
+
 class CategoryTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CategoryType.objects.all()
     serializer_class = CategoryTypeSerializer
 
-class RegisterSmartObject(APIView):
-    def post(self, request, format=None):
 
+class RegisterSmartObject(APIView):
+
+    def post(self, request, format=None):
         data = request.data
         serializer = SmartObjectSerializer(data=request.data)
         if serializer.is_valid():
-            # try connecting the object 
+            # try connecting the object
             url = 'http://' + data.get("address_ip") + ":" + data.get("port") + "/config"
-            try :
-                r = requests.get(url)
+            try:
+                r = requests.get(url, timeout=2)
             except:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -66,7 +74,7 @@ class RegisterSmartObject(APIView):
 
                 if action_serializer.is_valid():
                     action_serializer.save()
-            
+
             for ds in config["data-source"]:
                 data_source = ds
                 data_source["smart_object"] = smart_object.id
@@ -88,7 +96,7 @@ class RegisterSmartObject(APIView):
                 data_source["data_type"] = data_type.name
                 data_source["data_polling_type"] = data_polling_type.name
                 data_source_serializer = DataSourceSerializer(data=data_source)
-                
+
                 if data_source_serializer.is_valid():
                     data_source_created = data_source_serializer.save()
 
@@ -99,6 +107,7 @@ class RegisterSmartObject(APIView):
 
                     if data_source_serializer.is_valid():
                         data_source_serializer.save()
-            
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
