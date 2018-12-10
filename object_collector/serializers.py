@@ -8,17 +8,29 @@ class ActionSerializer(serializers.ModelSerializer):
         model = Action
         fields = ('name', 'command', 'payload', 'smart_object','id')
 
+
+class DataSourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataSource
+        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'entrypoint', 'data_polling_type', 'smart_object')
+
+
 class SmartObjectSerializer(serializers.ModelSerializer):
     actions = serializers.SerializerMethodField()
+    data_sources = serializers.SerializerMethodField()
 
     class Meta:
         model = SmartObject
-        fields = ('name','address_ip','port','id', 'actions', 'category')
+        fields = ('name','address_ip','port','id', 'category', 'actions', 'data_sources')
 
 
     def get_actions(self, obj):
         queryset = Action.objects.filter(smart_object=obj)
         return [ActionSerializer(m).data for m in queryset]
+
+    def get_data_sources(self, obj):
+        queryset = DataSource.objects.filter(smart_object=obj)
+        return [DataSourceSerializer(m).data for m in queryset]
 
 
 class DataPointSerializer(serializers.ModelSerializer):
@@ -32,11 +44,6 @@ class PerformedActionSerializer(serializers.ModelSerializer):
         model = PerformedAction
         fields = ('id','action','timestamp')
 
-
-class DataSourceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DataSource
-        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'entrypoint', 'data_polling_type', 'smart_object')
 
 
 # reference types
