@@ -2,17 +2,23 @@ from rest_framework import serializers
 
 from .models import Action, CategoryType, DataPoint, DataPollingType, DataSource, DataType, PerformedAction, SmartObject
 
-
-class SmartObjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SmartObject
-        fields = ('id', 'name', 'address_ip', 'port', 'category')
-
-
+# Serializers define the API representation.
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
         fields = ('name', 'command', 'payload', 'smart_object','id')
+
+class SmartObjectSerializer(serializers.ModelSerializer):
+    actions = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SmartObject
+        fields = ('name','address_ip','port','id', 'actions', 'category')
+
+
+    def get_actions(self, obj):
+        queryset = Action.objects.filter(smart_object=obj)
+        return [ActionSerializer(m).data for m in queryset]
 
 
 class DataPointSerializer(serializers.ModelSerializer):

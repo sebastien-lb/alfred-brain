@@ -111,3 +111,32 @@ class RegisterSmartObject(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PerformActionOnObject(APIView):
+    # arg:
+    # action_id: id of the action you want to execute
+    def post(self, request, format=None):
+        data = request.data
+        try :
+            action_id = data["action_id"]
+        except:
+            return Response("action_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+        
+        # execute action
+        action = Action.objects.get(pk=action_id)
+        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + action.command
+        try:
+            r = requests.get(url)
+        except: 
+            return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
+
+        # save ActionPerformed in db
+        data_performed_action = {"action": action.id}
+        performed_action_serializer = PerformedActionSerializer(data=data_performed_action)
+        # should always be valid, just checking for django
+        if performed_action_serializer.is_valid():
+            performed_action_serializer.save()
+
+        return Response("action performed succesfully", status=status.HTTP_200_OK)
+        
