@@ -36,10 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', login),
     path('registerDevice', RegisterSmartObject.as_view()),
-<<<<<<< HEAD
-=======
     path('performAction', PerformActionOnObject.as_view()),
->>>>>>> 038f23593b27f69d2a9447c88d6e77e1f33845a7
     url(r'^', include(router.urls)),
 
     # url(r'^api-auth/', include('rest_framework.urls'))
