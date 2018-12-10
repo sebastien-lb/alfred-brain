@@ -28,3 +28,14 @@ __Start App__
 ```
 python3 manage.py runserver
 ```
+
+__Troubleshooting__
+
+if mysqlclient not installing on MacOS, follow this :
+- remove TEMPORARY mysqlclient from requirement :
+- do :
+```
+LDFLAGS=-L/usr/local/opt/openssl/lib pip install mysqlclient 
+# https://github.com/PyMySQL/mysqlclient-python/issues/13
+pip install -r requirements.txt
+```
