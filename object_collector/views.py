@@ -123,12 +123,17 @@ class PerformActionOnObject(APIView):
         except:
             return Response("action_id param is missing", status=status.HTTP_400_BAD_REQUEST)
         
+        payload = data["payload"] if "payload" in data else {}
+        
         # execute action
         action = Action.objects.get(pk=action_id)
-        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + action.command
+        print(action.smart_object)
+        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "/" + action.command
         try:
-            r = requests.get(url)
-        except: 
+            r = requests.post(url, data = payload)
+            print("Response : " + r.text)
+        except:
+            print("Response : " + r.text)
             return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
 
         # save ActionPerformed in db
