@@ -60,7 +60,7 @@ class RegisterSmartObject(APIView):
             try:
                 r = requests.get(url, timeout=2)
             except:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response("Unable to connect to the object", status=status.HTTP_400_BAD_REQUEST)
 
             # save object
             smart_object = serializer.save()
@@ -75,6 +75,7 @@ class RegisterSmartObject(APIView):
                 if action_serializer.is_valid():
                     action_serializer.save()
 
+            data_source_ids = {} 
             for ds in config["data-source"]:
                 data_source = ds
                 data_source["smart_object"] = smart_object.id
@@ -102,11 +103,20 @@ class RegisterSmartObject(APIView):
 
                     # assign entrypoint to datasource
                     entrypoint = "/entryPoint/sourceId/" + str(data_source_created.id)
+                    data_source_ids[data_source_created.name] = str(data_source_created.id)
                     data_source["entrypoint"] = entrypoint
                     data_source_serializer = DataSourceSerializer(data_source_created, data=data_source)
 
                     if data_source_serializer.is_valid():
                         data_source_serializer.save()
+
+            # send server config to the object
+            url = 'http://' + data.get("address_ip") + ":" + data.get("port") + "/serverConfig"
+            server_config = {"url": "127.0.0.1", "port": "8000", "id": str(smart_object.id), "data-source-ids": data_source_ids}
+            try:
+                r = requests.post(url, data=json.dumps(server_config), timeout=2)
+            except:
+                return Response("Unable to send server config to the object", status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
