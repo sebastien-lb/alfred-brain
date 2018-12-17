@@ -7,6 +7,7 @@ import json
 
 from .models import *
 from .serializers import *
+from .logic import binaryConversion, fromBinary
 
 
 class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
@@ -75,7 +76,7 @@ class RegisterSmartObject(APIView):
                 if action_serializer.is_valid():
                     action_serializer.save()
 
-            data_source_ids = {} 
+            data_source_ids = {}
             for ds in config["data-source"]:
                 data_source = ds
                 data_source["smart_object"] = smart_object.id
@@ -100,15 +101,7 @@ class RegisterSmartObject(APIView):
 
                 if data_source_serializer.is_valid():
                     data_source_created = data_source_serializer.save()
-
-                    # assign entrypoint to datasource
-                    entrypoint = "/entryPoint/sourceId/" + str(data_source_created.id)
                     data_source_ids[data_source_created.name] = str(data_source_created.id)
-                    data_source["entrypoint"] = entrypoint
-                    data_source_serializer = DataSourceSerializer(data_source_created, data=data_source)
-
-                    if data_source_serializer.is_valid():
-                        data_source_serializer.save()
 
             # send server config to the object
             url = 'http://' + data.get("address_ip") + ":" + data.get("port") + "/serverConfig"
@@ -132,9 +125,9 @@ class PerformActionOnObject(APIView):
             action_id = data["action_id"]
         except:
             return Response("action_id param is missing", status=status.HTTP_400_BAD_REQUEST)
-        
+
         payload = data["payload"] if "payload" in data else {}
-        
+
         # execute action
         action = Action.objects.get(pk=action_id)
         print(action.smart_object)
@@ -143,7 +136,6 @@ class PerformActionOnObject(APIView):
             r = requests.post(url, data = payload)
             print("Response : " + r.text)
         except:
-            print("Response : " + r.text)
             return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
 
         # save ActionPerformed in db
@@ -154,4 +146,55 @@ class PerformActionOnObject(APIView):
             performed_action_serializer.save()
 
         return Response("action performed succesfully", status=status.HTTP_200_OK)
-        
+
+
+class LatestPointFromDataSource(APIView):
+    # arg:
+    # dats_source_id: id of the data source
+    def post(self, request, format=None):
+        data = request.data
+        try:
+            data_source_id = data["data_source_id"]
+        except:
+            return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+
+        data_source = DataSource.objects.get(pk=data_source_id)
+
+        data_point = DataPoint.objects.filter(data_source=data_source).latest("timestamp")
+        data_point_serializer = DataPointSerializer(data_point)
+        # serializer doesn't work with binary
+        ret_val = data_point_serializer.data
+        ret_val["value"] = fromBinary(data_point.value, data_source.data_type.name)
+        return Response(ret_val, status=status.HTTP_200_OK)
+
+
+class SaveDataPoint(APIView):
+
+    permission_classes = []
+
+    # arg:
+    # dats_source_id: id of the data source
+    # value: value of the dataPoint
+    def post(self, request, format=None):
+        data = request.data
+        try:
+            data_source_id = data["data_source_id"]
+        except:
+            return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            value = data["value"]
+        except:
+            return Response("value param is missing", status=status.HTTP_400_BAD_REQUEST)
+
+        data_source = DataSource.objects.get(pk=data_source_id)
+        binary_value = binaryConversion(value, data_source.data_type.name)
+        data_point = {"data_source": data_source_id }
+
+        data_point_serializer = DataPointSerializer(data=data_point)
+        if data_point_serializer.is_valid():
+            # binary values can not be saved with serializers
+            DataPoint.objects.create(data_source=data_source, value=binary_value)
+            return Response("Data Point Saved", status=status.HTTP_201_CREATED)
+
+        return Response("Unexpected Error", status=status.HTTP_400_BAD_REQUEST)
+

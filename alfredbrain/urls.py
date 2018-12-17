@@ -37,6 +37,8 @@ urlpatterns = [
     path('api/login', login),
     path('registerDevice', RegisterSmartObject.as_view()),
     path('performAction', PerformActionOnObject.as_view()),
+    path('latestDataPointFromDataSource', LatestPointFromDataSource.as_view()),
+    path('saveDataPoint', SaveDataPoint.as_view()),
     url(r'^', include(router.urls)),
 
     # url(r'^api-auth/', include('rest_framework.urls'))

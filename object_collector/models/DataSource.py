@@ -13,10 +13,8 @@ class DataSource(models.Model):
     # complete route : xxx.xxx.xxx.xxx:port/path/to/ressource
     #
     # endpoint is the smart object entrypoint
-    # entrypoint is the server entry point
 
     endpoint = models.CharField(max_length=(200), blank=True)
-    entrypoint = models.CharField(max_length=(200), blank=True)
 
     smart_object = models.ForeignKey(SmartObject, on_delete=models.CASCADE)
 

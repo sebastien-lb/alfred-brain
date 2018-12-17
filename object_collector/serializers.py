@@ -12,7 +12,7 @@ class ActionSerializer(serializers.ModelSerializer):
 class DataSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataSource
-        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'entrypoint', 'data_polling_type', 'smart_object')
+        fields = ('id', 'name', 'description', 'data_type', 'endpoint', 'data_polling_type', 'smart_object')
 
 
 class SmartObjectSerializer(serializers.ModelSerializer):
