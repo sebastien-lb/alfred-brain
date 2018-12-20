@@ -6,7 +6,7 @@ import requests
 import json
 
 from .models import *
-from .serializers import *
+from .serializers import DataPointSerializer, DataPollingTypeSerializer, DataSourceSerializer, CategoryTypeSerializer, SmartObjectSerializer, ActionSerializer, PerformedActionSerializer, DataTypeSerializer
 from .logic import binaryConversion, fromBinary
 
 
@@ -147,6 +147,18 @@ class PerformActionOnObject(APIView):
 
         return Response("action performed succesfully", status=status.HTTP_200_OK)
 
+def getLatestDataPointFromDataSource(data_source_id):
+    data_source = DataSource.objects.get(pk=data_source_id)
+
+    try:
+        data_point = DataPoint.objects.filter(data_source=data_source).latest("timestamp")
+    except: 
+        return None
+    data_point_serializer = DataPointSerializer(data_point)
+    # serializer doesn't work with binary
+    ret_val = data_point_serializer.data
+    ret_val["value"] = fromBinary(data_point.value, data_source.data_type.name)
+    return ret_val
 
 class LatestPointFromDataSource(APIView):
     # arg:
@@ -158,13 +170,7 @@ class LatestPointFromDataSource(APIView):
         except:
             return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
 
-        data_source = DataSource.objects.get(pk=data_source_id)
-
-        data_point = DataPoint.objects.filter(data_source=data_source).latest("timestamp")
-        data_point_serializer = DataPointSerializer(data_point)
-        # serializer doesn't work with binary
-        ret_val = data_point_serializer.data
-        ret_val["value"] = fromBinary(data_point.value, data_source.data_type.name)
+        ret_val = getLatestDataPointFromDataSource(data_source_id)
         return Response(ret_val, status=status.HTTP_200_OK)
 
 
@@ -198,3 +204,21 @@ class SaveDataPoint(APIView):
 
         return Response("Unexpected Error", status=status.HTTP_400_BAD_REQUEST)
 
+
+class ObjectState(APIView):
+    # return the latest datapoint from all datasources of an object
+    # args:
+    # smart_object_id: id of the smart_object
+    def post(self, request, format=None):
+        data = request.data
+        try:
+            smart_object_id = data["smart_object_id"]
+        except:
+            return Response("smart_object_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+
+        smart_object = SmartObject.objects.get(pk=smart_object_id)
+        data_sources = DataSource.objects.filter(smart_object=smart_object)
+        ret_val = {}
+        for data_source in data_sources:
+            ret_val[str(data_source.id)] = getLatestDataPointFromDataSource(data_source.id)
+        return Response(ret_val, status=status.HTTP_200_OK)
