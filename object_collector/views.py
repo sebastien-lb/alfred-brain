@@ -1,13 +1,16 @@
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-import requests
 import json
 
+import requests
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .logic import binaryConversion, getLatestDataPointFromDataSource
 from .models import *
-from .serializers import DataPointSerializer, DataPollingTypeSerializer, DataSourceSerializer, CategoryTypeSerializer, SmartObjectSerializer, ActionSerializer, PerformedActionSerializer, DataTypeSerializer
-from .logic import binaryConversion, fromBinary
+from .serializers import DataPointSerializer, DataPollingTypeSerializer, DataSourceSerializer, CategoryTypeSerializer, \
+    SmartObjectSerializer, ActionSerializer, PerformedActionSerializer, DataTypeSerializer
 
 
 class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
@@ -85,14 +88,13 @@ class RegisterSmartObject(APIView):
                     # check that data_type exists
                     data_type_name = ds["data-type"]
                     data_type = DataType.objects.get(pk=data_type_name)
-                except:
+                except (KeyError, ObjectDoesNotExist):
                     return Response("Unknown Data Type", status=status.HTTP_400_BAD_REQUEST)
-
                 try:
                     # check that data_polling_type_name exists
                     data_polling_type_name = ds["data-polling-type"]
                     data_polling_type = DataPollingType.objects.get(pk=data_polling_type_name)
-                except:
+                except (KeyError, ObjectDoesNotExist):
                     return Response("Unknown Data Polling Type", status=status.HTTP_400_BAD_REQUEST)
 
                 data_source["data_type"] = data_type.name
@@ -105,9 +107,10 @@ class RegisterSmartObject(APIView):
 
             # send server config to the object
             url = 'http://' + data.get("address_ip") + ":" + data.get("port") + "/serverConfig"
-            server_config = {"url": "127.0.0.1", "port": "8000", "id": str(smart_object.id), "data-source-ids": data_source_ids}
+            server_config = {"url": "127.0.0.1", "port": "8000", "id": str(smart_object.id),
+                             "data-source-ids": data_source_ids}
             try:
-                r = requests.post(url, data=json.dumps(server_config), timeout=2)
+                requests.post(url, data=json.dumps(server_config), timeout=2)
             except:
                 return Response("Unable to send server config to the object", status=status.HTTP_400_BAD_REQUEST)
 
@@ -121,7 +124,7 @@ class PerformActionOnObject(APIView):
     # action_id: id of the action you want to execute
     def post(self, request, format=None):
         data = request.data
-        try :
+        try:
             action_id = data["action_id"]
         except:
             return Response("action_id param is missing", status=status.HTTP_400_BAD_REQUEST)
@@ -133,7 +136,7 @@ class PerformActionOnObject(APIView):
         print(action.smart_object)
         url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "/" + action.command
         try:
-            r = requests.post(url, data = payload)
+            r = requests.post(url, data=payload)
             print("Response : " + r.text)
         except:
             return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
@@ -147,27 +150,15 @@ class PerformActionOnObject(APIView):
 
         return Response("action performed succesfully", status=status.HTTP_200_OK)
 
-def getLatestDataPointFromDataSource(data_source_id):
-    data_source = DataSource.objects.get(pk=data_source_id)
-
-    try:
-        data_point = DataPoint.objects.filter(data_source=data_source).latest("timestamp")
-    except: 
-        return None
-    data_point_serializer = DataPointSerializer(data_point)
-    # serializer doesn't work with binary
-    ret_val = data_point_serializer.data
-    ret_val["value"] = fromBinary(data_point.value, data_source.data_type.name)
-    return ret_val
 
 class LatestPointFromDataSource(APIView):
-    # arg:
-    # dats_source_id: id of the data source
-    def post(self, request, format=None):
-        data = request.data
+
+    # parameters:
+    # data_source_id: id of the data source
+    def get(self, request):
         try:
-            data_source_id = data["data_source_id"]
-        except:
+            data_source_id = request.GET['data_source_id']
+        except MultiValueDictKeyError:
             return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
 
         ret_val = getLatestDataPointFromDataSource(data_source_id)
@@ -175,26 +166,25 @@ class LatestPointFromDataSource(APIView):
 
 
 class SaveDataPoint(APIView):
-
     permission_classes = []
 
     # arg:
-    # dats_source_id: id of the data source
+    # data_source_id: id of the data source
     # value: value of the dataPoint
     def post(self, request, format=None):
         data = request.data
         try:
             data_source_id = data["data_source_id"]
-        except:
+        except KeyError:
             return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
         try:
             value = data["value"]
-        except:
+        except KeyError:
             return Response("value param is missing", status=status.HTTP_400_BAD_REQUEST)
 
         data_source = DataSource.objects.get(pk=data_source_id)
         binary_value = binaryConversion(value, data_source.data_type.name)
-        data_point = {"data_source": data_source_id }
+        data_point = {"data_source": data_source_id}
 
         data_point_serializer = DataPointSerializer(data=data_point)
         if data_point_serializer.is_valid():
@@ -206,14 +196,13 @@ class SaveDataPoint(APIView):
 
 
 class ObjectState(APIView):
-    # return the latest datapoint from all datasources of an object
-    # args:
+    # return the latest data point from all data sources of an object
+    # parameters:
     # smart_object_id: id of the smart_object
-    def post(self, request, format=None):
-        data = request.data
+    def get(self, request):
         try:
-            smart_object_id = data["smart_object_id"]
-        except:
+            smart_object_id = request.GET['smart_object_id']
+        except MultiValueDictKeyError:
             return Response("smart_object_id param is missing", status=status.HTTP_400_BAD_REQUEST)
 
         smart_object = SmartObject.objects.get(pk=smart_object_id)
