@@ -18,7 +18,7 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 
-from object_collector.views import *
+from object_collector.views import SmartObjectViewSet, ActionViewSet, DataTypeViewSet, DataPollingTypeViewSet, DataSourceViewSet, PerformedActionViewSet, DataPointsViewSet, CategoryTypeViewSet, RegisterSmartObject, PerformActionOnObject, LatestPointFromDataSource, SaveDataPoint, ObjectState
 from .views import login
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -39,6 +39,7 @@ urlpatterns = [
     path('performAction', PerformActionOnObject.as_view()),
     path('latestDataPointFromDataSource', LatestPointFromDataSource.as_view()),
     path('saveDataPoint', SaveDataPoint.as_view()),
+    path('objectState', ObjectState.as_view()),
     url(r'^', include(router.urls)),
 
     # url(r'^api-auth/', include('rest_framework.urls'))
