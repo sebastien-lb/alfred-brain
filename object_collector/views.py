@@ -205,7 +205,11 @@ class ObjectState(APIView):
         except MultiValueDictKeyError:
             return Response("smart_object_id param is missing", status=status.HTTP_400_BAD_REQUEST)
 
-        smart_object = SmartObject.objects.get(pk=smart_object_id)
+        try:
+            smart_object = SmartObject.objects.get(pk=smart_object_id)
+        except ObjectDoesNotExist:
+            return Response("smart object does not exist", status=status.HTTP_400_BAD_REQUEST)
+            
         data_sources = DataSource.objects.filter(smart_object=smart_object)
         ret_val = {}
         for data_source in data_sources:
