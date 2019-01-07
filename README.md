@@ -29,6 +29,11 @@ __Start App__
 python3 manage.py runserver
 ```
 
+__Test with Postman__
+```
+Check that : https://stackoverflow.com/questions/50715237/how-to-test-django-rest-api-using-postman#answer-50715566
+```
+
 __Troubleshooting__
 
 if mysqlclient not installing on MacOS, follow this :
