@@ -1,6 +1,12 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 from .models import SmartObject, Action, DataSource, DataType, DataPollingType, CategoryType
+from .views import RegisterSmartObject
+from rest_framework.test import APIRequestFactory, force_authenticate, RequestsClient
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+import httpretty, json
 
 class TestSmartObjectCase(TestCase):
     def setUp(self):
@@ -89,3 +95,72 @@ class TestDataSourceCase(TestCase):
 
         dataPollingType = DataPollingType.objects.get(name="dataPollingType_test")
         self.assertEqual(dataSource.data_polling_type, dataPollingType)
+
+
+class TestRegisterObject(TestCase):
+
+    ip = "192.168.1.1"
+    port = "800"
+    name = "ObjectName"
+    config_body = {
+    "name": "coolObject",
+    "type": "lamp",
+    "actions": [
+        {
+            "name": "on",
+            "command": "/on"
+        },
+        {
+            "name": "off",
+            "command": "/off"
+        }
+        ],
+        "data-source": [
+            {
+                "name": "state",
+                "description": "return the state",
+                "endpoint": "/state",
+                "data-type": "boolean",
+                "data-polling-type": "ON_REQUEST"
+            }
+        ]
+    }
+
+    def setUp(self):
+        # setUp user
+        self.user = User.objects.create_user(username='testuser', email="test@test.test", password="12345")
+        login = self.client.login(username='testuser', password='12345')
+
+        #add types in db
+        DataType.objects.create(name="boolean")
+        DataPollingType.objects.create(name="ON_REQUEST")
+
+    @httpretty.activate
+    def test_get_conf(self):
+
+        # mock for object conf
+        httpretty.register_uri(
+            httpretty.GET,
+            "http://" + self.ip + ":" + self.port + '/config',
+            body=json.dumps(self.config_body)
+        )
+
+        # mock for object receiving server conf
+        httpretty.register_uri(
+            httpretty.POST,
+            "http://" + self.ip + ":" + self.port + '/serverConfig',
+        )
+
+        # mock incoming http request
+        data = {
+            "address_ip": self.ip,
+            "port": self.port,
+            "name": self.name,
+        }
+        
+        request_factory = APIRequestFactory()
+        post_request = request_factory.post(path="registerDevice", data=data)
+        force_authenticate(post_request, user=self.user)
+        response = RegisterSmartObject.as_view()(post_request)
+        print(response, response.data)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
