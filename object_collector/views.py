@@ -9,8 +9,7 @@ from rest_framework.views import APIView
 
 from .logic import binaryConversion, getLatestDataPointFromDataSource
 from .models import *
-from .serializers import DataPointSerializer, DataPollingTypeSerializer, DataSourceSerializer, CategoryTypeSerializer, \
-    SmartObjectSerializer, ActionSerializer, PerformedActionSerializer, DataTypeSerializer
+from .serializers import *
 
 
 class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
@@ -51,6 +50,21 @@ class DataPointsViewSet(viewsets.ReadOnlyModelViewSet):
 class CategoryTypeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = CategoryType.objects.all()
     serializer_class = CategoryTypeSerializer
+
+
+class ConditionViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Condition.objects.all()
+    serializer_class = ConditionSerializer
+
+
+class OperatorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Operator.objects.all()
+    serializer_class = OperatorSerializer
+
+
+class ScenarioViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Scenario.objects.all()
+    serializer_class = ScenarioSerializer
 
 
 class RegisterSmartObject(APIView):
@@ -209,7 +223,7 @@ class ObjectState(APIView):
             smart_object = SmartObject.objects.get(pk=smart_object_id)
         except ObjectDoesNotExist:
             return Response("smart object does not exist", status=status.HTTP_400_BAD_REQUEST)
-            
+
         data_sources = DataSource.objects.filter(smart_object=smart_object)
         ret_val = {}
         for data_source in data_sources:

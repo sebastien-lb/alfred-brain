@@ -18,7 +18,7 @@ from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
 
-from object_collector.views import SmartObjectViewSet, ActionViewSet, DataTypeViewSet, DataPollingTypeViewSet, DataSourceViewSet, PerformedActionViewSet, DataPointsViewSet, CategoryTypeViewSet, RegisterSmartObject, PerformActionOnObject, LatestPointFromDataSource, SaveDataPoint, ObjectState
+from object_collector.views import *
 from .views import login
 
 # Routers provide an easy way of automatically determining the URL conf.
@@ -31,6 +31,9 @@ router.register(r'dataSource', DataSourceViewSet)
 router.register(r'performedActions', PerformedActionViewSet)
 router.register(r'dataPoints', DataPointsViewSet)
 router.register(r'categoryType', CategoryTypeViewSet)
+router.register(r'condition', ConditionViewSet)
+router.register(r'operator', OperatorViewSet)
+router.register(r'scenario', ScenarioViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
