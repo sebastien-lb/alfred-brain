@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'object_collector',
     'django_nose',
+    'rest_framework_swagger'
 ]
 
 MIDDLEWARE = [
@@ -98,6 +99,10 @@ DATABASES = {
         'PORT': '3306'
 
     }
+}
+
+SWAGGER_SETTINGS = {
+    'JSON_EDITOR': True
 }
 
 
