@@ -146,7 +146,7 @@ class PerformActionOnObject(APIView):
         # execute action
         action = Action.objects.get(pk=action_id)
         print(action.smart_object)
-        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "/" + action.command
+        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "" + action.command
         try:
             r = requests.post(url, data=payload)
             print("Response : " + r.text)
