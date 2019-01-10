@@ -74,6 +74,18 @@ class RegisterSmartObject(APIView):
             for a in config["actions"]:
                 action = a
                 action["smart_object"] = smart_object.id
+
+                if "payloads" in action.keys() and action["payloads"][0]["type"]: 
+                    try:
+                        # we only deal with one parameters for now and with its type
+                        action_payload_type_name = action["payloads"][0]["type"]
+
+                        print("action_payload_type", action_payload_type_name)
+                        action_payload_type = DataType.objects.get(pk=action_payload_type_name)
+                        action["payload"] = action_payload_type.name
+                    except (KeyError, ObjectDoesNotExist):
+                        return Response("Unknown Data Type for action", status=status.HTTP_400_BAD_REQUEST)
+                
                 action_serializer = ActionSerializer(data=action)
 
                 if action_serializer.is_valid():
