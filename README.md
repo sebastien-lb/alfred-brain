@@ -37,7 +37,7 @@ Check that : https://stackoverflow.com/questions/50715237/how-to-test-django-res
 __API Documentation__
 
 From Swagger : 
-> https://app.swaggerhub.com/apis/St00k/Alfred/1.0.0#/action
+> https://app.swaggerhub.com/apis/St00k/alfred-api/1.0.0
 
 This documentation is the visualisation of the alfred API
 
