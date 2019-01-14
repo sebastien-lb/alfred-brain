@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import SmartObject, Action, CategoryType, DataType, DataPollingType, DataSource, DataPoint
+from .models import *
 
 
 # Register your models here.
@@ -25,6 +25,15 @@ class DataPointAdmin(admin.ModelAdmin):
 class CategoryTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
+class ConditionAdmin(admin.ModelAdmin):
+    list_display = ('id','value','operator','scenario','data_source')
+
+class ScenarioAdmin(admin.ModelAdmin):
+    list_display = ('id','name',)
+
+class OperatorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+
 admin.site.register(SmartObject, SmartObjectAdmin)
 admin.site.register(Action, ActionAdmin)
 admin.site.register(DataType, DataTypeAdmin)
@@ -32,3 +41,6 @@ admin.site.register(DataPollingType, DataPollingTypeAdmin)
 admin.site.register(DataSource, DataSourceAdmin)
 admin.site.register(DataPoint, DataPointAdmin)
 admin.site.register(CategoryType, CategoryTypeAdmin)
+admin.site.register(Condition, ConditionAdmin)
+admin.site.register(Scenario, ScenarioAdmin)
+admin.site.register(Operator, OperatorAdmin)
