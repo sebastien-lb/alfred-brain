@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url, include
 from rest_framework import routers
+from rest_framework_swagger.views import get_swagger_view
 
 from object_collector.views import SmartObjectViewSet, ActionViewSet, DataTypeViewSet, DataPollingTypeViewSet, DataSourceViewSet, PerformedActionViewSet, DataPointsViewSet, CategoryTypeViewSet, RegisterSmartObject, PerformActionOnObject, LatestPointFromDataSource, SaveDataPoint, ObjectState, DataPointHistoryFromDataSource, ObjectHistory
 from .views import login
@@ -32,6 +33,8 @@ router.register(r'performedActions', PerformedActionViewSet)
 router.register(r'dataPoints', DataPointsViewSet)
 router.register(r'categoryType', CategoryTypeViewSet)
 
+schema_view = get_swagger_view(title='Pastebin API')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/login', login),
@@ -42,6 +45,7 @@ urlpatterns = [
     path('objectHistory', ObjectHistory.as_view()),
     path('saveDataPoint', SaveDataPoint.as_view()),
     path('objectState', ObjectState.as_view()),
+    url(r'swagger', schema_view),
     url(r'^', include(router.urls)),
 
     # url(r'^api-auth/', include('rest_framework.urls'))

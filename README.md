@@ -29,6 +29,18 @@ __Start App__
 python3 manage.py runserver
 ```
 
+__Test with Postman__
+```
+Check that : https://stackoverflow.com/questions/50715237/how-to-test-django-rest-api-using-postman#answer-50715566
+```
+
+__API Documentation__
+
+From Swagger : 
+> https://app.swaggerhub.com/apis/St00k/Alfred/1.0.0#/action
+
+This documentation is the visualisation of the alfred API
+
 __Troubleshooting__
 
 if mysqlclient not installing on MacOS, follow this :
