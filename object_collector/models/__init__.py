@@ -1,4 +1,5 @@
 from .Action import Action
+from .ActionScenario import ActionScenario
 from .PerformedAction import PerformedAction
 from .DataPoint import DataPoint
 from .DataSource import DataSource
