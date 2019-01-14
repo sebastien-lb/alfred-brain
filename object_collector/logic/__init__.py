@@ -1,2 +1,2 @@
 from .dataTypeConversion import binaryConversion, fromBinary
-from .dataPointUtils import getLatestDataPointFromDataSource
+from .dataPointUtils import getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource
