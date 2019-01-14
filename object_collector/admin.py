@@ -8,7 +8,7 @@ class SmartObjectAdmin(admin.ModelAdmin):
     list_display = ('name', 'id', 'address_ip', 'port')
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'id', 'command', 'smart_object')
+    list_display = ('name', 'id', 'command', 'smart_object', 'important')
 
 class DataTypeAdmin(admin.ModelAdmin):
     list_display = ('name',)

@@ -10,6 +10,7 @@ class Action(models.Model):
     command = models.CharField(max_length=(100))
     payload = models.ForeignKey(DataType, blank=True, null=True, on_delete=models.CASCADE)
     smart_object = models.ForeignKey(SmartObject, on_delete=models.CASCADE)
+    important = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Actions"

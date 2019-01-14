@@ -30,7 +30,7 @@ class TestActionCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
         device_test = SmartObject.objects.get(name="device_test")
-        Action.objects.create(name="action", command="on", smart_object=device_test)
+        Action.objects.create(name="action", command="on", smart_object=device_test, important=True)
 
     def test_object_created(self):
         device_test = SmartObject.objects.get(name="device_test")
@@ -108,11 +108,13 @@ class TestRegisterObject(TestCase):
     "actions": [
         {
             "name": "on",
-            "command": "/on"
+            "command": "/on",
+            "important": True
         },
         {
             "name": "off",
-            "command": "/off"
+            "command": "/off",
+            "important": True
         }
         ],
         "data-source": [

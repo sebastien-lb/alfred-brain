@@ -6,7 +6,7 @@ from .models import Action, CategoryType, DataPoint, DataPollingType, DataSource
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ('name', 'command', 'payload', 'smart_object','id')
+        fields = ('name', 'command', 'payload', 'smart_object','id', 'important')
 
 
 class DataSourceSerializer(serializers.ModelSerializer):
