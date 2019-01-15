@@ -35,6 +35,7 @@ router.register(r'categoryType', CategoryTypeViewSet)
 router.register(r'condition', ConditionViewSet)
 router.register(r'operator', OperatorViewSet)
 router.register(r'scenario', ScenarioViewSet)
+router.register(r'actionScenario', ActionScenarioViewSet)
 
 schema_view = get_swagger_view(title='Pastebin API')
 

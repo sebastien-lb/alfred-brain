@@ -67,6 +67,11 @@ class ScenarioViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ScenarioSerializer
 
 
+class ActionScenarioViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ActionScenario.objects.all()
+    serializer_class = ActionScenarioSerializer
+
+
 class RegisterSmartObject(APIView):
 
     def post(self, request, format=None):

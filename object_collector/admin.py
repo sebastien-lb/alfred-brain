@@ -31,6 +31,9 @@ class ConditionAdmin(admin.ModelAdmin):
 class ScenarioAdmin(admin.ModelAdmin):
     list_display = ('id','name',)
 
+class ActionScenarioAdmin(admin.ModelAdmin):
+    list_display = ('action', 'scenario', 'payload')
+
 class OperatorAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
@@ -43,4 +46,5 @@ admin.site.register(DataPoint, DataPointAdmin)
 admin.site.register(CategoryType, CategoryTypeAdmin)
 admin.site.register(Condition, ConditionAdmin)
 admin.site.register(Scenario, ScenarioAdmin)
+admin.site.register(ActionScenario, ActionScenarioAdmin)
 admin.site.register(Operator, OperatorAdmin)
