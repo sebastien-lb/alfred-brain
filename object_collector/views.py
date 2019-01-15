@@ -7,7 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .logic import binaryConversion, getLatestDataPointFromDataSource
+from .logic import binaryConversion, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource
 from .models import *
 from .serializers import *
 
@@ -88,6 +88,18 @@ class RegisterSmartObject(APIView):
             for a in config["actions"]:
                 action = a
                 action["smart_object"] = smart_object.id
+
+                if "payloads" in action.keys() and action["payloads"][0]["type"]: 
+                    try:
+                        # we only deal with one parameters for now and with its type
+                        action_payload_type_name = action["payloads"][0]["type"]
+
+                        print("action_payload_type", action_payload_type_name)
+                        action_payload_type = DataType.objects.get(pk=action_payload_type_name)
+                        action["payload"] = action_payload_type.name
+                    except (KeyError, ObjectDoesNotExist):
+                        return Response("Unknown Data Type for action", status=status.HTTP_400_BAD_REQUEST)
+                
                 action_serializer = ActionSerializer(data=action)
 
                 if action_serializer.is_valid():
@@ -143,16 +155,15 @@ class PerformActionOnObject(APIView):
         except:
             return Response("action_id param is missing", status=status.HTTP_400_BAD_REQUEST)
 
-        payload = data["payload"] if "payload" in data else {}
+        payload = {"payload": data["payload"]} if "payload" in data else {}
 
         # execute action
         action = Action.objects.get(pk=action_id)
-        print(action.smart_object)
-        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "/" + action.command
+        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "" + action.command
+        print("execute action", action.smart_object, payload, url)
         try:
             r = requests.post(url, data=payload)
-            print("Response : " + r.text)
-        except:
+        except: 
             return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
 
         # save ActionPerformed in db
@@ -228,4 +239,39 @@ class ObjectState(APIView):
         ret_val = {}
         for data_source in data_sources:
             ret_val[str(data_source.id)] = getLatestDataPointFromDataSource(data_source.id)
+        return Response(ret_val, status=status.HTTP_200_OK)
+
+class DataPointHistoryFromDataSource(APIView):
+
+    # parameters:
+    # data_source_id: id of the data source
+    def get(self, request):
+        try:
+            data_source_id = request.GET['data_source_id']
+        except MultiValueDictKeyError:
+            return Response("data_source_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+
+        ret_val = getLatestDataPointsFromDataSource(data_source_id)
+        return Response(ret_val, status=status.HTTP_200_OK)
+
+
+class ObjectHistory(APIView):
+    # return the history of the data point from all data sources of an object
+    # parameters:
+    # smart_object_id: id of the smart_object
+    def get(self, request):
+        try:
+            smart_object_id = request.GET['smart_object_id']
+        except MultiValueDictKeyError:
+            return Response("smart_object_id param is missing", status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            smart_object = SmartObject.objects.get(pk=smart_object_id)
+        except ObjectDoesNotExist:
+            return Response("smart object does not exist", status=status.HTTP_400_BAD_REQUEST)
+            
+        data_sources = DataSource.objects.filter(smart_object=smart_object)
+        ret_val = {}
+        for data_source in data_sources:
+            ret_val[str(data_source.id)] = getLatestDataPointsFromDataSource(data_source.id)
         return Response(ret_val, status=status.HTTP_200_OK)

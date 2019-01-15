@@ -9,7 +9,8 @@
                     "name": "<NAME>",
                     "type": "number"
                 }
-            ]
+            ],
+            "important": "action_should_be_displayed_by_default <True>"
         }
     ],
     "data-source": [
