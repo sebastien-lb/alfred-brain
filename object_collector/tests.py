@@ -133,10 +133,6 @@ class TestRegisterObject(TestCase):
         self.user = User.objects.create_user(username='testuser', email="test@test.test", password="12345")
         login = self.client.login(username='testuser', password='12345')
 
-        #add types in db
-        DataType.objects.create(name="boolean")
-        DataPollingType.objects.create(name="ON_REQUEST")
-
     @httpretty.activate
     def test_get_conf(self):
 
