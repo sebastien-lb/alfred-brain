@@ -55,7 +55,7 @@ class ScenarioSerializer(serializers.ModelSerializer):
 class ActionScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActionScenario
-        fields = ('action', 'scenario', 'payload')
+        fields = ('action', 'scenario', 'payload', 'data_type')
 
 
 class OperatorSerializer(serializers.ModelSerializer):
