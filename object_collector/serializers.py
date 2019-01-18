@@ -61,7 +61,7 @@ class ActionScenarioSerializer(serializers.ModelSerializer):
 class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operator
-        fields = ('id','name')
+        fields = ('id','name', 'allowed_types')
 
 
 class PerformedActionSerializer(serializers.ModelSerializer):
@@ -76,7 +76,7 @@ class PerformedActionSerializer(serializers.ModelSerializer):
 class DataTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataType
-        fields = ('name','operator')
+        fields = ('name',)
 
 
 class DataPollingTypeSerializer(serializers.ModelSerializer):
