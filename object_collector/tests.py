@@ -30,7 +30,7 @@ class TestActionCase(TestCase):
     def setUp(self):
         SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
         device_test = SmartObject.objects.get(name="device_test")
-        Action.objects.create(name="action", command="on", smart_object=device_test)
+        Action.objects.create(name="action", command="on", smart_object=device_test, important=True)
 
     def test_object_created(self):
         device_test = SmartObject.objects.get(name="device_test")
@@ -108,11 +108,13 @@ class TestRegisterObject(TestCase):
     "actions": [
         {
             "name": "on",
-            "command": "/on"
+            "command": "/on",
+            "important": True
         },
         {
             "name": "off",
-            "command": "/off"
+            "command": "/off",
+            "important": True
         }
         ],
         "data-source": [
@@ -130,10 +132,6 @@ class TestRegisterObject(TestCase):
         # setUp user
         self.user = User.objects.create_user(username='testuser', email="test@test.test", password="12345")
         login = self.client.login(username='testuser', password='12345')
-
-        #add types in db
-        DataType.objects.create(name="boolean")
-        DataPollingType.objects.create(name="ON_REQUEST")
 
     @httpretty.activate
     def test_get_conf(self):

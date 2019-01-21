@@ -7,7 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .logic import binaryConversion, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource
+from .logic import binaryConversion, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource, testTriggerScenario, performAction
 from .models import *
 from .serializers import *
 
@@ -67,6 +67,11 @@ class ScenarioViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = ScenarioSerializer
 
 
+class ActionScenarioViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = ActionScenario.objects.all()
+    serializer_class = ActionScenarioSerializer
+
+
 class RegisterSmartObject(APIView):
 
     def post(self, request, format=None):
@@ -89,7 +94,7 @@ class RegisterSmartObject(APIView):
                 action = a
                 action["smart_object"] = smart_object.id
 
-                if "payloads" in action.keys() and action["payloads"][0]["type"]: 
+                if "payloads" in action.keys() and action["payloads"][0]["type"]:
                     try:
                         # we only deal with one parameters for now and with its type
                         action_payload_type_name = action["payloads"][0]["type"]
@@ -99,7 +104,7 @@ class RegisterSmartObject(APIView):
                         action["payload"] = action_payload_type.name
                     except (KeyError, ObjectDoesNotExist):
                         return Response("Unknown Data Type for action", status=status.HTTP_400_BAD_REQUEST)
-                
+
                 action_serializer = ActionSerializer(data=action)
 
                 if action_serializer.is_valid():
@@ -158,22 +163,12 @@ class PerformActionOnObject(APIView):
         payload = {"payload": data["payload"]} if "payload" in data else {}
 
         # execute action
-        action = Action.objects.get(pk=action_id)
-        url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + "" + action.command
-        print("execute action", action.smart_object, payload, url)
-        try:
-            r = requests.post(url, data=payload)
-        except: 
+        correct = performAction(action_id, payload)
+
+        if correct:
+            return Response("action performed succesfully", status=status.HTTP_200_OK)
+        else:
             return Response("object is unreachable", status=status.HTTP_400_BAD_REQUEST)
-
-        # save ActionPerformed in db
-        data_performed_action = {"action": action.id}
-        performed_action_serializer = PerformedActionSerializer(data=data_performed_action)
-        # should always be valid, just checking for django
-        if performed_action_serializer.is_valid():
-            performed_action_serializer.save()
-
-        return Response("action performed succesfully", status=status.HTTP_200_OK)
 
 
 class LatestPointFromDataSource(APIView):
@@ -210,6 +205,8 @@ class SaveDataPoint(APIView):
         data_source = DataSource.objects.get(pk=data_source_id)
         binary_value = binaryConversion(value, data_source.data_type.name)
         data_point = {"data_source": data_source_id}
+
+        testTriggerScenario(data_source_id, value)
 
         data_point_serializer = DataPointSerializer(data=data_point)
         if data_point_serializer.is_valid():
@@ -269,7 +266,7 @@ class ObjectHistory(APIView):
             smart_object = SmartObject.objects.get(pk=smart_object_id)
         except ObjectDoesNotExist:
             return Response("smart object does not exist", status=status.HTTP_400_BAD_REQUEST)
-            
+
         data_sources = DataSource.objects.filter(smart_object=smart_object)
         ret_val = {}
         for data_source in data_sources:
@@ -292,6 +289,10 @@ class RegisterScenario(APIView):
         if serializer.is_valid():
             scenario = serializer.save()
 
+            try:
+                data["actions"]
+            except KeyError:
+                return Response("Action is missing", status=status.HTTP_400_BAD_REQUEST)
             for a in data["actions"]:
                 try:
                     action_id = a["action_id"]
@@ -318,6 +319,10 @@ class RegisterScenario(APIView):
                 else :
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+            try:
+                data["conditions"]
+            except KeyError:
+                return Response("Condition is missing", status=status.HTTP_400_BAD_REQUEST)
             for cd in data["conditions"]:
                 try:
                     operator_id = cd["operator_id"]

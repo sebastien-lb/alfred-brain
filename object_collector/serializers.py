@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from .models import Action, CategoryType, Condition, DataPoint, DataPollingType, DataSource, DataType, \
+from .models import Action, ActionScenario, CategoryType, Condition, DataPoint, DataPollingType, DataSource, DataType, \
     Operator, PerformedAction, Scenario, SmartObject
 
 # Serializers define the API representation.
 class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Action
-        fields = ('name', 'command', 'payload', 'smart_object','id')
+        fields = ('name', 'command', 'payload', 'smart_object','id', 'important')
 
 
 class DataSourceSerializer(serializers.ModelSerializer):
@@ -49,13 +49,19 @@ class ConditionSerializer(serializers.ModelSerializer):
 class ScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scenario
-        fields = ('id','name','actions')
+        fields = ('id','name')
+
+
+class ActionScenarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActionScenario
+        fields = ('action', 'scenario', 'payload')
 
 
 class OperatorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Operator
-        fields = ('id','name')
+        fields = ('id','name', 'allowed_types')
 
 
 class PerformedActionSerializer(serializers.ModelSerializer):
@@ -70,7 +76,7 @@ class PerformedActionSerializer(serializers.ModelSerializer):
 class DataTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataType
-        fields = ('name','operator')
+        fields = ('name',)
 
 
 class DataPollingTypeSerializer(serializers.ModelSerializer):

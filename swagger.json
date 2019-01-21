@@ -1,0 +1,696 @@
+{  
+  "swagger":"2.0",
+  "info":{  
+     "description":"This is the alfred brain API doc",
+     "version":"1.0.0",
+     "title":"Alfred API",
+     "termsOfService":"",
+     "contact":{  
+        "email":""
+     },
+     "license":{  
+        "name":"Apache 2.0",
+        "url":"http://www.apache.org/licenses/LICENSE-2.0.html"
+     }
+  },
+  "host":"#",
+  "basePath":"/v2",
+  "tags":[  
+      {  
+         "name":"Chiros",
+         "description":"Smart object endpoints"
+      },
+     {  
+        "name":"AlfredBrain",
+        "description":"The Custom Server API"
+     },
+     {  
+         "name":"action",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"categoryType",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"dataPoints",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"dataPollingType",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"dataSource",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"dataType",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"performedActions",
+         "description":"a django default interface"
+      },
+      {  
+         "name":"smartObject",
+         "description":"a django default interface"
+      }
+  ],
+  "schemes":[  
+     "https",
+     "http"
+  ],
+  "paths":{
+   "/config":{  
+      "get":{  
+         "tags":[  
+            "Chiros"
+         ],
+         "summary":"Get the object config",
+         "description":"",
+         "operationId":"",
+         "consumes":[],
+         "produces":[  
+            "application/json"
+         ],
+         "parameters":[],
+         "responses":{  
+            "200":{  
+               "description":"Object config in json format",
+               "schema":{  
+                 "$ref":"#/definitions/SmartObjectConfig"
+               }
+
+            },
+            "400":{  
+               "description":"Bad Request"
+            }
+         },
+         "security":[]
+        }
+      },
+      "/configServer":{  
+         "get":{  
+            "tags":[  
+               "Chiros"
+            ],
+            "summary":"Set the server config",
+            "description":"",
+            "operationId":"",
+            "consumes":[],
+            "parameters":[{
+               "schema":{  
+                  "$ref":"#/definitions/ServerConfig"
+               }
+            }],
+            "produces":[  
+               "application/json"
+            ],
+            "requestBody":{  
+               "$ref":"#/definitions/ServerConfig"
+            },
+            "responses":{  
+               "200":{  
+                  "description":"Success"   
+               },
+               "400":{  
+                  "description":"Bad Request"
+               }
+            },
+            "security":[]
+           }
+         },
+      "/objectState":{  
+         "get":{  
+            "tags":[  
+               "AlfredBrain"
+            ],
+            "summary":"Get an object state",
+            "description":"Get an object state",
+            "produces":[  
+               "application/json"
+            ],
+            "parameters":[  
+                {  
+                   "in":"data_source_id",
+                   "name":"data_source_id",
+                   "type":"string",
+                   "description":"The id of the data source to be fetched",
+                   "required":true
+                }
+            ],
+            "responses":{  
+               "200":{
+                  "description":"successful operation",
+                  "schema": {"$ref": "#/definitions/ListOfDataPoints"}
+               },
+               "400":{  
+                  "description":"Invalid Order"
+               }
+            }
+         }
+      }, 
+      "/latestDataPointFromDataSource":{  
+         "get":{  
+            "tags":[  
+               "AlfredBrain"
+            ],
+            "summary":"Get latest datapoint in the DB",
+            "description":"Get latest datapoint in the DB",
+            "produces":[
+               "application/json"
+            ],
+            "parameters":[  
+             {  
+               "in":"data_source_id",
+               "name":"data_source_id",
+               "type":"string",
+               "description":"The id of the data source to be fetched",
+               "required":true
+             }
+            ],
+            "responses":{  
+               "200":{
+                  "description":"successful operation",
+                   "schema":{  
+                     "$ref":"#/definitions/DataPoint"
+                   }
+               },
+               "400":{  
+                  "description":"Bad Request"
+               }
+            },
+            "security":[]
+         }
+      },
+      "/api/login":{  
+      "post":{  
+         "tags":[  
+            "AlfredBrain"
+         ],
+         "summary":"Get a token to allow auth",
+         "description":"",
+         "operationId":"",
+         "consumes":[  
+            "application/json"
+         ],
+         "produces":[  
+            "string"
+         ],
+         "parameters":[
+            {  
+              "in":"username",
+              "name":"username",
+              "description":"A username",
+              "required":true,
+              "type":"string"
+            },{  
+              "in":"password",
+              "name":"password",
+              "description":"The username password",
+              "type":"string",
+              "required":true
+            }
+         ],
+         "responses":{
+            "200":{  
+               "description":"Success"
+            },  
+            "400":{  
+               "description":"Bad Request"
+            }
+         },
+         "security":[]
+        }
+      },
+      "/performAction":{  
+         "post":{  
+            "tags":[  
+               "AlfredBrain"
+            ],
+            "summary":"Perform an action on an object",
+            "description":"Perform an action on an object",
+            "produces":[  
+               "string"
+            ],
+            "parameters":[  
+             {  
+               "in":"action_id",
+               "name":"action_id",
+               "type":"string",
+               "description":"The id of the action to be performed",
+               "required":true
+             }
+            ],
+            "responses":{  
+               "200":{  
+                  "description":"successful operation"
+               },
+               "400":{  
+                  "description":"Bad Request"
+               }
+            },
+            "security":[]
+         }
+      },
+      "/registerDevice":{  
+        "post":{  
+           "tags":[  
+              "AlfredBrain"
+           ],
+           "summary":"Register a new device",
+           "description":"",
+           "operationId":"",
+           "consumes":[  
+              "application/json"
+           ],
+           "produces":[  
+              "string"
+           ],
+           "parameters":[
+              {  
+                "in":"address_ip",
+                "name":"address_ip",
+                "description":"The IP adress of the device",
+                "required":true,
+                "type":"string"
+              },{  
+                "in":"port",
+                "name":"port",
+                "description":"The port used by the device",
+                "type":"number",
+                "required":true
+              },{  
+                "in":"name",
+                "name":"name",
+                "type":"string",
+                "description":"Name of the device",
+                "required":true
+              }
+           ],
+           "responses":{  
+              "400":{  
+                 "description":"Bad Request"
+              }
+           },
+           "security":[]
+          }
+        },
+     "/saveDataPoint":{  
+        "post":{  
+           "tags":[  
+              "AlfredBrain"
+           ],
+           "summary":"Add a datapoint in the DB",
+           "description":"Add a datapoint in the DB",
+           "produces":[  
+              "string"
+           ],
+           "parameters":[  
+            {  
+              "in":"data_source_id",
+              "name":"data_source_id",
+              "type":"string",
+              "description":"The id of the source attached",
+              "required":true
+            },{  
+              "in":"value",
+              "name":"value",
+              "type":"any",
+              "description":"Value to save (can be any form of data)",
+              "required":true
+            }
+           ],
+           "responses":{  
+              "200":{  
+                 "description":"successful operation"
+              },
+              "400":{  
+                 "description":"Bad Request"
+              }
+           },
+           "security":[]
+        }
+     },
+   "/action/":{  
+      "get":{  
+         "operationId":"action_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "action"
+         ]
+      }
+   },
+   "/action/{id}/":{  
+      "get":{  
+         "operationId":"action_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"id",
+               "required":true,
+               "in":"path",
+               "description":"A UUID string identifying this action.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "action"
+         ]
+      }
+   },
+   "/categoryType/":{  
+      "get":{  
+         "operationId":"categoryType_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "categoryType"
+         ]
+      }
+   },
+   "/categoryType/{name}/":{  
+      "get":{  
+         "operationId":"categoryType_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"name",
+               "required":true,
+               "in":"path",
+               "description":"A unique value identifying this category type.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "categoryType"
+         ]
+      }
+   },
+   "/dataPoints/":{  
+      "get":{  
+         "operationId":"dataPoints_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "dataPoints"
+         ]
+      }
+   },
+   "/dataPoints/{id}/":{  
+      "get":{  
+         "operationId":"dataPoints_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"id",
+               "required":true,
+               "in":"path",
+               "description":"A UUID string identifying this data point.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "dataPoints"
+         ]
+      }
+   },
+   "/dataPollingType/":{  
+      "get":{  
+         "operationId":"dataPollingType_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "dataPollingType"
+         ]
+      }
+   },
+   "/dataPollingType/{name}/":{  
+      "get":{  
+         "operationId":"dataPollingType_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"name",
+               "required":true,
+               "in":"path",
+               "description":"A unique value identifying this data polling type.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "dataPollingType"
+         ]
+      }
+   },
+   "/dataSource/":{  
+      "get":{  
+         "operationId":"dataSource_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "dataSource"
+         ]
+      }
+   },
+   "/dataSource/{id}/":{  
+      "get":{  
+         "operationId":"dataSource_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"id",
+               "required":true,
+               "in":"path",
+               "description":"A UUID string identifying this data source.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "dataSource"
+         ]
+      }
+   },
+   "/dataType/":{  
+      "get":{  
+         "operationId":"dataType_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "dataType"
+         ]
+      }
+   },
+   "/dataType/{name}/":{  
+      "get":{  
+         "operationId":"dataType_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"name",
+               "required":true,
+               "in":"path",
+               "description":"A unique value identifying this data type.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "dataType"
+         ]
+      }
+   },
+   "/performedActions/":{  
+      "get":{  
+         "operationId":"performedActions_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "performedActions"
+         ]
+      }
+   },
+   "/performedActions/{id}/":{  
+      "get":{  
+         "operationId":"performedActions_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"id",
+               "required":true,
+               "in":"path",
+               "description":"A UUID string identifying this performed action.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "performedActions"
+         ]
+      }
+   },
+   "/smartObject/":{  
+      "get":{  
+         "operationId":"smartObject_list",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+
+         ],
+         "tags":[  
+            "smartObject"
+         ]
+      }
+   },
+   "/smartObject/{id}/":{  
+      "get":{  
+         "operationId":"smartObject_read",
+         "responses":{  
+            "200":{  
+               "description":""
+            }
+         },
+         "parameters":[  
+            {  
+               "name":"id",
+               "required":true,
+               "in":"path",
+               "description":"A UUID string identifying this smart object.",
+               "type":"string"
+            }
+         ],
+         "tags":[  
+            "smartObject"
+         ]
+      }
+   }
+  },
+  "securityDefinitions":{  
+     "petstore_auth":{  
+        "type":"oauth2",
+        "authorizationUrl":"https://petstore.swagger.io/oauth/authorize",
+        "flow":"implicit",
+        "scopes":{  
+           "write:pets":"modify pets in your account",
+           "read:pets":"read your pets"
+        }
+     },
+     "api_key":{  
+        "type":"apiKey",
+        "name":"api_key",
+        "in":"header"
+     }
+  },
+  "definitions":{ 
+      "ServerConfig":{
+         "type":"object",
+         "properties":{}
+      },
+      "SmartObjectConfig":{
+         "type":"object",
+         "properties":{}
+      },
+      "DataPoint":{  
+        "type":"object",
+        "properties":{  
+           "id":{
+              "type":"string",
+              "format":"string"
+           },
+           "value":{  
+              "type":"object",
+              "format":"any"
+           },
+           "data_source":{  
+              "type":"string",
+              "format":"string"
+           },
+           "timestamp":{  
+              "type":"string",
+              "format":"date-time"
+           }
+        }
+     },
+     "ListOfDataPoints":{
+         "type":"object",
+         "properties":{"object_UUID":{"$ref":"#/definitions/DataPoint"}}
+      }
+  },
+  "externalDocs":{  
+     "description":"Find out more about Swagger",
+     "url":"http://swagger.io"
+  }
+}

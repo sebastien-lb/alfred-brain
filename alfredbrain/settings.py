@@ -25,7 +25,7 @@ SECRET_KEY = '(ho)4ypus_=h^awtla&lg#r)45+b2$rwb$60g@i)%zr(jdmyl2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'object_collector',
     'django_nose',
+    'rest_framework_swagger'
 ]
 
 MIDDLEWARE = [
@@ -98,6 +99,10 @@ DATABASES = {
         'PORT': '3306'
 
     }
+}
+
+SWAGGER_SETTINGS = {
+    'JSON_EDITOR': True
 }
 
 
