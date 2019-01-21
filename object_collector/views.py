@@ -309,14 +309,13 @@ class RegisterScenario(APIView):
 
                 action_scenario = {"action" : action_id, "scenario" : scenario.id}
                 binary_payload = binaryConversion(payload, action.payload.name)
-                action_scenario["payload"] = binary_payload
 
                 action_scenario_serializer = ActionScenarioSerializer(data = action_scenario)
 
                 if action_scenario_serializer.is_valid():
-                    action_scenario_serializer.save()
+                    ActionScenario.objects.create(action=action, scenario=scenario, payload=binary_payload)
 
-                else :
+                else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -337,7 +336,7 @@ class RegisterScenario(APIView):
                 except KeyError:
                     return Response("Value is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
-                    Operator.objects.get(pk=operator_id)
+                    operator = Operator.objects.get(pk=operator_id)
                 except ObjectDoesNotExist:
                     return Response("Operator does not exist", status=status.HTTP_400_BAD_REQUEST)
                 try:
@@ -345,18 +344,14 @@ class RegisterScenario(APIView):
                 except ObjectDoesNotExist:
                     return Response("Data Source does not exist", status=status.HTTP_400_BAD_REQUEST)
 
-
-
                 condition = {"operator" : operator_id, "data_source" : data_source_id, "scenario" : scenario.id}
                 binary_value = binaryConversion(value,data_source.data_type.name)
-                condition["value"] = binary_value
 
                 condition_serializer = ConditionSerializer(data=condition)
 
                 if condition_serializer.is_valid():
-                    condition_serializer.save()
-
-                else :
+                    Condition.objects.create(data_source=data_source, operator=operator, scenario=scenario, value=binary_value)
+                else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
