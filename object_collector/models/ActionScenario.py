@@ -2,7 +2,6 @@ from django.db import models
 
 from .Action import Action
 from .Scenario import Scenario
-from .ReferenceType import DataType
 
 
 class ActionScenario(models.Model):
