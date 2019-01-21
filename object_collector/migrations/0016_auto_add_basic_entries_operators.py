@@ -2,12 +2,17 @@
 
 from django.db import migrations
 
-def add_operators(apps, schema_editor):
+def add_datatypes_operators(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     Operator = apps.get_model("object_collector", "Operator") 
     DataType = apps.get_model("object_collector", "DataType")
     datatypes_keys = ['boolean', 'string', 'number']
-    operators_keys = ['LT', 'LTE', 'GT', 'GTE', 'EQUAL']
+    operators_keys = ['EQUAL', 'GT', 'GTE', 'LT', 'LTE']
+    datatypes = {k : DataType.objects.using(db_alias).filter(name = k) for k in datatypes_keys}
+    for k in datatypes:
+        if datatypes[k].count() == 0:
+            DataType(name = k).save()
+
     datatypes = {k : DataType.objects.using(db_alias).get(name = k) for k in datatypes_keys}
     operators = {k: Operator.objects.using(db_alias).filter(name = k) for k in operators_keys}
     for k in operators:
@@ -24,6 +29,15 @@ def add_operators(apps, schema_editor):
                 if operators[k].allowed_types.filter(name = datatype).count() == 0:
                     operators[k].allowed_types.add(datatypes[datatype])
 
+def add_datapollingtypes(apps, schema_editor):  
+    db_alias = schema_editor.connection.alias 
+    DataPollingType = apps.get_model("object_collector", "DataPollingType")
+    datapollingtypes_keys = ['ON_REQUEST', 'ON_PUSH']
+    datapollingtypes = {k : DataPollingType.objects.using(db_alias).filter(name = k) for k in datapollingtypes_keys}
+    for k in datapollingtypes:
+        if datapollingtypes[k].count() == 0:
+            DataPollingType(name = k).save()
+
 
 
 class Migration(migrations.Migration):
@@ -32,5 +46,6 @@ class Migration(migrations.Migration):
         ('object_collector', '0015_auto_20190118_1544'),
     ]
 
-    operations = [migrations.RunPython(add_operators),
+    operations = [migrations.RunPython(add_datatypes_operators),
+    migrations.RunPython(add_datapollingtypes),
     ]

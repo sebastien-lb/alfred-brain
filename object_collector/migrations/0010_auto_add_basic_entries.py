@@ -5,7 +5,7 @@ from django.db import migrations
 def add_datatypes(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     DataType = apps.get_model("object_collector", "DataType")
-    datatypes_keys = ['boolean', 'string', 'number']
+    datatypes_keys = ['boolean']
     datatypes = {k : DataType.objects.using(db_alias).filter(name = k) for k in datatypes_keys}
     for k in datatypes:
         if datatypes[k].count() == 0:
@@ -14,7 +14,7 @@ def add_datatypes(apps, schema_editor):
 def add_datapollingtypes(apps, schema_editor):  
     db_alias = schema_editor.connection.alias 
     DataPollingType = apps.get_model("object_collector", "DataPollingType")
-    datapollingtypes_keys = ['ON_REQUEST', 'ON_PUSH']
+    datapollingtypes_keys = ['ON_REQUEST']
     datapollingtypes = {k : DataPollingType.objects.using(db_alias).filter(name = k) for k in datapollingtypes_keys}
     for k in datapollingtypes:
         if datapollingtypes[k].count() == 0:
