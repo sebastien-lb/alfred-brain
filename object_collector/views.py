@@ -275,3 +275,86 @@ class ObjectHistory(APIView):
         for data_source in data_sources:
             ret_val[str(data_source.id)] = getLatestDataPointsFromDataSource(data_source.id)
         return Response(ret_val, status=status.HTTP_200_OK)
+
+
+class RegisterScenario(APIView):
+
+    def post(self, request, format=None):
+        data = request.data
+        try:
+            scenario_name = data["name"]
+        except KeyError :
+            return Response("Scenario Name is missing", status=status.HTTP_400_BAD_REQUEST)
+        scenario_data = {"name" : scenario_name}
+
+        serializer = ScenarioSerializer(data=scenario_data)
+
+        if serializer.is_valid():
+            scenario = serializer.save()
+
+            for a in data["actions"]:
+                try:
+                    action_id = a["action_id"]
+                except KeyError:
+                    return Response("Action id is missing", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    payload = a["payload"]
+                except KeyError:
+                    return Response("Payload is missing", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    action = Action.objects.get(pk=action_id)
+                except ObjectDoesNotExist:
+                    return Response("Action does not exist", status=status.HTTP_400_BAD_REQUEST)
+
+                action_scenario = {"action" : action_id, "scenario" : scenario.id}
+                binary_payload = binaryConversion(payload, action.payload.name)
+                action_scenario["payload"] = binary_payload
+
+                action_scenario_serializer = ActionScenarioSerializer(data = action_scenario)
+
+                if action_scenario_serializer.is_valid():
+                    action_scenario_serializer.save()
+
+                else :
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            for cd in data["conditions"]:
+                try:
+                    operator_id = cd["operator_id"]
+                except KeyError:
+                    return Response("Operator id is missing", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    data_source_id = cd["data_source_id"]
+                except KeyError:
+                    return Response("Data source id is missing", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    value = cd["value"]
+                except KeyError:
+                    return Response("Value is missing", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    Operator.objects.get(pk=operator_id)
+                except ObjectDoesNotExist:
+                    return Response("Operator does not exist", status=status.HTTP_400_BAD_REQUEST)
+                try:
+                    data_source = DataSource.objects.get(pk=data_source_id)
+                except ObjectDoesNotExist:
+                    return Response("Data Source does not exist", status=status.HTTP_400_BAD_REQUEST)
+
+
+
+                condition = {"operator" : operator_id, "data_source" : data_source_id, "scenario" : scenario.id}
+                binary_value = binaryConversion(value,data_source.data_type.name)
+                condition["value"] = binary_value
+
+                condition_serializer = ConditionSerializer(data=condition)
+
+                if condition_serializer.is_valid():
+                    condition_serializer.save()
+
+                else :
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        else :
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
