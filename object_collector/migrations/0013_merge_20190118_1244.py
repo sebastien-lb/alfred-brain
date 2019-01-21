@@ -6,8 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('object_collector', '0012_actionscenario_data_type'),
         ('object_collector', '0010_auto_add_basic_entries'),
+        ('object_collector', '0012_actionscenario_data_type'),
     ]
 
     operations = [

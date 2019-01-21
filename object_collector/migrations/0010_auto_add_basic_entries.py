@@ -2,18 +2,24 @@
 
 from django.db import migrations
 
-def auto_add(apps, schema_editor):
+def add_datatypes(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     DataType = apps.get_model("object_collector", "DataType")
-    datatypes = DataType.objects.using(db_alias).filter(name = "boolean")
-    if datatypes.count() == 0:
-        DataType(name = "boolean").save()
+    datatypes_keys = ['boolean', 'string', 'number']
+    datatypes = {k : DataType.objects.using(db_alias).filter(name = k) for k in datatypes_keys}
+    for k in datatypes:
+        if datatypes[k].count() == 0:
+            DataType(name = k).save()
 
+def add_datapollingtypes(apps, schema_editor):  
+    db_alias = schema_editor.connection.alias 
     DataPollingType = apps.get_model("object_collector", "DataPollingType")
-    datapollingtypes = DataPollingType.objects.using(db_alias).filter(name = "ON_REQUEST")
-    if datapollingtypes.count() == 0:
-        DataPollingType(name = "ON_REQUEST").save()
-    
+    datapollingtypes_keys = ['ON_REQUEST', 'ON_PUSH']
+    datapollingtypes = {k : DataPollingType.objects.using(db_alias).filter(name = k) for k in datapollingtypes_keys}
+    for k in datapollingtypes:
+        if datapollingtypes[k].count() == 0:
+            DataPollingType(name = k).save()
+
 
 class Migration(migrations.Migration):
 
@@ -21,5 +27,6 @@ class Migration(migrations.Migration):
         ('object_collector', '0009_action_important'),
     ]
 
-    operations = [migrations.RunPython(auto_add),
+    operations = [migrations.RunPython(add_datatypes),
+    migrations.RunPython(add_datapollingtypes),
     ]
