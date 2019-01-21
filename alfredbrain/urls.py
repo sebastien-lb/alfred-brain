@@ -49,6 +49,7 @@ urlpatterns = [
     path('objectHistory', ObjectHistory.as_view()),
     path('saveDataPoint', SaveDataPoint.as_view()),
     path('objectState', ObjectState.as_view()),
+    path('registerScenario', RegisterScenario.as_view()),
     url(r'swagger', schema_view),
     url(r'^', include(router.urls)),
 

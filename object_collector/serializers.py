@@ -49,13 +49,13 @@ class ConditionSerializer(serializers.ModelSerializer):
 class ScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scenario
-        fields = ('id','name','actions')
+        fields = ('id','name')
 
 
 class ActionScenarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActionScenario
-        fields = ('action', 'scenario', 'payload', 'data_type')
+        fields = ('action', 'scenario', 'payload')
 
 
 class OperatorSerializer(serializers.ModelSerializer):
