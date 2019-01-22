@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from .logic import binaryConversion, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource, testTriggerScenario, performAction
 from .models import *
 from .serializers import *
+from django.db import transaction
 
 
 class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
@@ -99,10 +100,10 @@ class RegisterSmartObject(APIView):
                         # we only deal with one parameters for now and with its type
                         action_payload_type_name = action["payloads"][0]["type"]
 
-                        print("action_payload_type", action_payload_type_name)
                         action_payload_type = DataType.objects.get(pk=action_payload_type_name)
                         action["payload"] = action_payload_type.name
                     except (KeyError, ObjectDoesNotExist):
+                        transaction.set_rollback(True)
                         return Response("Unknown Data Type for action", status=status.HTTP_400_BAD_REQUEST)
 
                 action_serializer = ActionSerializer(data=action)
@@ -120,12 +121,14 @@ class RegisterSmartObject(APIView):
                     data_type_name = ds["data-type"]
                     data_type = DataType.objects.get(pk=data_type_name)
                 except (KeyError, ObjectDoesNotExist):
+                    transaction.set_rollback(True)
                     return Response("Unknown Data Type", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     # check that data_polling_type_name exists
                     data_polling_type_name = ds["data-polling-type"]
                     data_polling_type = DataPollingType.objects.get(pk=data_polling_type_name)
                 except (KeyError, ObjectDoesNotExist):
+                    transaction.set_rollback(True)
                     return Response("Unknown Data Polling Type", status=status.HTTP_400_BAD_REQUEST)
 
                 data_source["data_type"] = data_type.name
@@ -143,6 +146,7 @@ class RegisterSmartObject(APIView):
             try:
                 requests.post(url, data=json.dumps(server_config), timeout=2)
             except:
+                transaction.set_rollback(True)
                 return Response("Unable to send server config to the object", status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -280,9 +284,9 @@ class RegisterScenario(APIView):
         data = request.data
         try:
             scenario_name = data["name"]
-        except KeyError :
+        except KeyError:
             return Response("Scenario Name is missing", status=status.HTTP_400_BAD_REQUEST)
-        scenario_data = {"name" : scenario_name}
+        scenario_data = {"name": scenario_name}
 
         serializer = ScenarioSerializer(data=scenario_data)
 
@@ -292,19 +296,23 @@ class RegisterScenario(APIView):
             try:
                 data["actions"]
             except KeyError:
+                transaction.set_rollback(True)
                 return Response("Action is missing", status=status.HTTP_400_BAD_REQUEST)
             for a in data["actions"]:
                 try:
                     action_id = a["action_id"]
                 except KeyError:
+                    transaction.set_rollback(True)
                     return Response("Action id is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     payload = a["payload"]
                 except KeyError:
+                    transaction.set_rollback(True)
                     return Response("Payload is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     action = Action.objects.get(pk=action_id)
                 except ObjectDoesNotExist:
+                    transaction.set_rollback(True)
                     return Response("Action does not exist", status=status.HTTP_400_BAD_REQUEST)
 
                 action_scenario = {"action" : action_id, "scenario" : scenario.id}
@@ -316,32 +324,39 @@ class RegisterScenario(APIView):
                     ActionScenario.objects.create(action=action, scenario=scenario, payload=binary_payload)
 
                 else:
+                    transaction.set_rollback(True)
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 data["conditions"]
             except KeyError:
+                transaction.set_rollback(True)
                 return Response("Condition is missing", status=status.HTTP_400_BAD_REQUEST)
             for cd in data["conditions"]:
                 try:
                     operator_id = cd["operator_id"]
                 except KeyError:
+                    transaction.set_rollback(True)
                     return Response("Operator id is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     data_source_id = cd["data_source_id"]
                 except KeyError:
+                    transaction.set_rollback(True)
                     return Response("Data source id is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     value = cd["value"]
                 except KeyError:
+                    transaction.set_rollback(True)
                     return Response("Value is missing", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     operator = Operator.objects.get(pk=operator_id)
                 except ObjectDoesNotExist:
+                    transaction.set_rollback(True)
                     return Response("Operator does not exist", status=status.HTTP_400_BAD_REQUEST)
                 try:
                     data_source = DataSource.objects.get(pk=data_source_id)
                 except ObjectDoesNotExist:
+                    transaction.set_rollback(True)
                     return Response("Data Source does not exist", status=status.HTTP_400_BAD_REQUEST)
 
                 condition = {"operator" : operator_id, "data_source" : data_source_id, "scenario" : scenario.id}
@@ -352,9 +367,11 @@ class RegisterScenario(APIView):
                 if condition_serializer.is_valid():
                     Condition.objects.create(data_source=data_source, operator=operator, scenario=scenario, value=binary_value)
                 else:
+                    transaction.set_rollback(True)
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        else :
+        else:
+            transaction.set_rollback(True)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
