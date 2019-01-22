@@ -316,7 +316,11 @@ class RegisterScenario(APIView):
                     return Response("Action does not exist", status=status.HTTP_400_BAD_REQUEST)
 
                 action_scenario = {"action" : action_id, "scenario" : scenario.id}
-                binary_payload = binaryConversion(payload, action.payload.name)
+
+                if action.payload:
+                    binary_payload = binaryConversion(payload, action.payload.name)
+                else:
+                    binary_payload = None
 
                 action_scenario_serializer = ActionScenarioSerializer(data = action_scenario)
 

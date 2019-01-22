@@ -43,7 +43,10 @@ def launchAllActionScenario(scenario_id):
     actionsScenario = ActionScenario.objects.filter(scenario_id=scenario_id)
 
     for actionScenario in actionsScenario:
-        payload = fromBinary(actionScenario.payload, actionScenario.data_type)
+        if actionScenario.payload and actionScenario.action.payload :
+            payload = fromBinary(actionScenario.payload, actionScenario.action.payload)
+        else:
+            payload = None
         performAction(actionScenario.action.id, payload)
 
 
