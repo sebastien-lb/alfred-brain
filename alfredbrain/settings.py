@@ -101,6 +101,8 @@ DATABASES = {
     }
 }
 
+ATOMIC_REQUESTS = True
+
 SWAGGER_SETTINGS = {
     'JSON_EDITOR': True
 }
