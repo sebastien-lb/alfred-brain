@@ -9,7 +9,7 @@ def performAction(action_id, payload):
     action = Action.objects.get(pk=action_id)
     url = 'http://' + action.smart_object.address_ip + ":" + action.smart_object.port + action.command
     try:
-        r = requests.post(url, data=payload)
+        r = requests.post(url, json=payload )
         print("Response : " + r.text)
     except:
         return False
