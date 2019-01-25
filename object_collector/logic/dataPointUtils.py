@@ -22,7 +22,7 @@ def getLatestDataPointsFromDataSource(data_source_id, nb_points = 10):
     data_source = DataSource.objects.get(pk=data_source_id)
 
     try:
-        data_points = DataPoint.objects.filter(data_source=data_source).order_by("timestamp")[:nb_points]
+        data_points = DataPoint.objects.filter(data_source=data_source).order_by("-timestamp")[:nb_points]
     except:
         return None
     ret_val = []
