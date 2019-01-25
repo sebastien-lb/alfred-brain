@@ -12,6 +12,8 @@ from .models import *
 from .serializers import *
 from django.db import transaction
 
+import logging
+logger = logging.getLogger('django')
 
 class SmartObjectViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = SmartObject.objects.all()
@@ -158,6 +160,7 @@ class PerformActionOnObject(APIView):
     # arg:
     # action_id: id of the action you want to execute
     def post(self, request, format=None):
+        logger.info("Perform Action")
         data = request.data
         try:
             action_id = data["action_id"]
@@ -210,6 +213,7 @@ class SaveDataPoint(APIView):
         binary_value = binaryConversion(value, data_source.data_type.name)
         data_point = {"data_source": data_source_id}
 
+        logger.info("Start Testing scenario")
         testTriggerScenario(data_source_id, value)
 
         data_point_serializer = DataPointSerializer(data=data_point)
@@ -316,7 +320,11 @@ class RegisterScenario(APIView):
                     return Response("Action does not exist", status=status.HTTP_400_BAD_REQUEST)
 
                 action_scenario = {"action" : action_id, "scenario" : scenario.id}
-                binary_payload = binaryConversion(payload, action.payload.name)
+
+                if action.payload:
+                    binary_payload = binaryConversion(payload, action.payload.name)
+                else:
+                    binary_payload = None
 
                 action_scenario_serializer = ActionScenarioSerializer(data = action_scenario)
 
