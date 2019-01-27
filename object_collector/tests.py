@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from .models import SmartObject, Action, DataSource, DataType, DataPollingType, CategoryType
-from .views import RegisterSmartObject
+from .models import SmartObject, Action, DataSource, DataType, DataPollingType, CategoryType, Operator
+from .views import RegisterSmartObject, RegisterScenario
 from rest_framework.test import APIRequestFactory, force_authenticate, RequestsClient
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -160,5 +160,56 @@ class TestRegisterObject(TestCase):
         post_request = request_factory.post(path="registerDevice", data=data)
         force_authenticate(post_request, user=self.user)
         response = RegisterSmartObject.as_view()(post_request)
+        print(response, response.data)
+        self.assertEquals(response.status_code, status.HTTP_201_CREATED)
+
+
+class TestRegisterScenario(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', email="test@test.test", password="12345")
+        login = self.client.login(username='testuser', password='12345')
+
+
+        SmartObject.objects.create(name="device_test", address_ip="127.0.0.1", port="5000")
+        device_test = SmartObject.objects.get(name="device_test")
+        Action.objects.create(name="action_test", command="on", smart_object=device_test, important=True)
+
+        data_type_boolean = DataType.objects.get(pk="boolean")
+        data_polling_type = DataPollingType.objects.get(pk="ON_REQUEST")
+        DataSource.objects.create(
+            name="datasource_test",
+            description="test of datasource object creation",
+            data_type=data_type_boolean,
+            endpoint="/temperature",
+            data_polling_type=data_polling_type,
+            smart_object=device_test
+        )
+
+        Operator.objects.create(name="operator_test")
+        operator = Operator.objects.get(name="operator_test")
+        operator.allowed_types.set(["boolean"])
+
+    def test_scenario_registratiom(self):
+        data = {
+            "name": "Scenar-Test",
+            "actions": [
+                {
+                    "action_id": str(Action.objects.get(name="action_test").id),
+                    "payload": None
+                }
+            ],
+            "conditions": [
+                {
+                    "data_source_id": str(DataSource.objects.get(name="datasource_test").id),
+                    "operator_id": str(Operator.objects.get(name="operator_test").id),
+                    "value": "1"
+                }
+            ]
+        }
+
+        request_factory = APIRequestFactory()
+        post_request = request_factory.post(path="registerScenario", data=data, format='json')
+        force_authenticate(post_request, user=self.user)
+        response = RegisterScenario.as_view()(post_request)
         print(response, response.data)
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
