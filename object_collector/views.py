@@ -7,7 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .logic import binaryConversion, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource, testTriggerScenario, performAction
+from .logic import binaryConversion, fromBinary, getLatestDataPointFromDataSource, getLatestDataPointsFromDataSource, testTriggerScenario, performAction
 from .models import *
 from .serializers import *
 from django.db import transaction
@@ -246,6 +246,7 @@ class ObjectState(APIView):
             ret_val[str(data_source.id)] = getLatestDataPointFromDataSource(data_source.id)
         return Response(ret_val, status=status.HTTP_200_OK)
 
+
 class DataPointHistoryFromDataSource(APIView):
 
     # parameters:
@@ -333,7 +334,7 @@ class RegisterScenario(APIView):
 
                 else:
                     transaction.set_rollback(True)
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(action_scenario_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             try:
                 data["conditions"]
@@ -376,10 +377,53 @@ class RegisterScenario(APIView):
                     Condition.objects.create(data_source=data_source, operator=operator, scenario=scenario, value=binary_value)
                 else:
                     transaction.set_rollback(True)
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(condition_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         else:
             transaction.set_rollback(True)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DetailedScenarii(APIView):
+    # return the all the details scenario 
+    def get(self, request):
+    
+        scenarii = Scenario.objects.all()
+        ret_val = []
+
+        for scenario in scenarii:
+            scenario_serialized = ScenarioSerializer(scenario).data
+
+            action_scenario_queryset = ActionScenario.objects.filter(scenario=scenario)
+            for action_scenario in action_scenario_queryset:
+                action_scenario_serialized = ActionScenarioSerializer(action_scenario).data
+                action = Action.objects.get(pk=action_scenario.action.id)
+                action_scenario_serialized["action"] = ActionSerializer(action).data
+                if action.payload:
+                    action_scenario_serialized["payload"] = fromBinary(action_scenario.payload, action.payload.name)
+                try :
+                    scenario_serialized["actions"] += [action_scenario_serialized]
+                except KeyError:
+                    scenario_serialized["actions"] = [action_scenario_serialized]
+
+
+            condition_queryset = Condition.objects.filter(scenario=scenario)
+            for condition in condition_queryset:
+                operator = Operator.objects.get(pk=condition.operator.id)
+                data_source = DataSource.objects.get(pk=condition.data_source.id)
+                condition_serialized = ConditionSerializer(condition).data
+                condition_serialized["operator"] = OperatorSerializer(operator).data
+                condition_serialized["data_source"] = DataSourceSerializer(data_source).data
+                condition_serialized["value"] = fromBinary(condition.value, data_source.data_type.name)
+
+                try:
+                    scenario_serialized["conditions"] += condition_serialized
+                except KeyError:
+                    scenario_serialized["conditions"] = condition_serialized
+
+            ret_val += [scenario_serialized]
+
+
+        return Response(ret_val, status=status.HTTP_200_OK)
