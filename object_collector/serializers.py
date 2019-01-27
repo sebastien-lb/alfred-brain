@@ -48,35 +48,18 @@ class OperatorSerializer(serializers.ModelSerializer):
 
 
 class ConditionSerializer(serializers.ModelSerializer):
-    operator = OperatorSerializer()
-    data_source = DataSourceSerializer()
-
     class Meta:
         model = Condition
         fields = ('id','value','operator','scenario','data_source')
 
 
 class ScenarioSerializer(serializers.ModelSerializer):
-    actions = serializers.SerializerMethodField()
-    conditions = serializers.SerializerMethodField()
-
-
     class Meta:
         model = Scenario
-        fields = ('id','name', 'actions', 'conditions')
-
-    def get_actions(self, obj):
-        queryset = ActionScenario.objects.filter(scenario=obj)
-        return [ActionScenarioSerializer(a).data for a in queryset]
-    
-    def get_conditions(self, obj):
-        queryset = Condition.objects.filter(scenario=obj)
-        return [ConditionSerializer(c).data for c in queryset]
+        fields = ('id','name',)
 
 
 class ActionScenarioSerializer(serializers.ModelSerializer):
-    action = ActionSerializer()
-    
     class Meta:
         model = ActionScenario
         fields = ('action', 'scenario', 'payload')
