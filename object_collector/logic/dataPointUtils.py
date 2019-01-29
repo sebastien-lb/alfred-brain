@@ -18,7 +18,7 @@ def getLatestDataPointFromDataSource(data_source_id):
     return ret_val
 
 
-def getLatestDataPointsFromDataSource(data_source_id, nb_points = 10):
+def getLatestDataPointsFromDataSource(data_source_id, nb_points = 20):
     data_source = DataSource.objects.get(pk=data_source_id)
 
     try:
