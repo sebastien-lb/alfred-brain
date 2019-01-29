@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 from django.core.exceptions import ObjectDoesNotExist
@@ -143,7 +144,7 @@ class RegisterSmartObject(APIView):
 
             # send server config to the object
             url = 'http://' + data.get("address_ip") + ":" + data.get("port") + "/serverConfig"
-            server_config = {"url": "127.0.0.1", "port": "8000", "id": str(smart_object.id),
+            server_config = {"url": os.environ["HOST_IP"] if "HOST_IP" in os.environ else "127.0.0.1", "port": "8000", "id": str(smart_object.id),
                              "data-source-ids": data_source_ids}
             try:
                 requests.post(url, data=json.dumps(server_config), timeout=2)
