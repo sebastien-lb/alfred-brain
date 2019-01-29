@@ -42,8 +42,8 @@ def validateCondition(condition, value):
     condition_value = fromBinary(condition.value, condition.data_source.data_type.name)
 
     logger.info("test condition with value %d and seuil at %d and operator %s" % (value, condition_value, operator))
-    logger.info("Return %r" % (compare(operator, value, condition_value)))
-    return compare(operator, value, condition_value)
+    logger.info("Return %r" % (compare(operator, condition.data_source.data_type.name, value, condition_value)))
+    return compare(operator, condition.data_source.data_type.name, value, condition_value)
 
 
 def launchAllActionScenario(scenario_id):
