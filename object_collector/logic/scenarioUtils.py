@@ -58,7 +58,7 @@ def launchAllActionScenario(scenario_id):
         else:
             payload = None
 
-        performAction(actionScenario.action.id, payload)
+        performAction(actionScenario.action.id, {"payload": payload})
 
 
 

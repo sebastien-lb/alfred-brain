@@ -1,5 +1,8 @@
 import struct
+import logging
+import json
 
+logger = logging.getLogger('django')
 
 def binaryConversion(value, data_type_name):
     if data_type_name == "boolean":
@@ -12,7 +15,7 @@ def binaryConversion(value, data_type_name):
         s = bytes(value, 'utf-8')    # Or other appropriate encoding
         return struct.pack("50s", s)
     elif data_type_name == "number":
-        return struct.pack("d", value)
+        return struct.pack("d", float(value))
     return None
 
 def fromBinary(binary_value, data_type_name):
@@ -33,6 +36,10 @@ def fromBinary(binary_value, data_type_name):
         for c in string:
             if c != 0:
                 rep += chr(c)
+        try:
+            rep = json.loads(rep)
+        except json.JSONDecodeError:
+            logger.error("FAILED to convert binary color payload : JSON provided by the user nay be in the wrong format : {}".format(rep))
         return rep
 
     elif data_type_name == "number":
