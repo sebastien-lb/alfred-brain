@@ -189,7 +189,7 @@ class TestRegisterScenario(TestCase):
         operator = Operator.objects.get(name="operator_test")
         operator.allowed_types.set(["boolean"])
 
-    def test_scenario_registratiom(self):
+    def test_scenario_registration(self):
         data = {
             "name": "Scenar-Test",
             "actions": [
