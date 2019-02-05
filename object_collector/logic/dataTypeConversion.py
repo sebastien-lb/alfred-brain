@@ -1,6 +1,7 @@
 import struct
 import logging
 import json
+import datetime
 
 logger = logging.getLogger('django')
 
@@ -16,6 +17,8 @@ def binaryConversion(value, data_type_name):
         return struct.pack("50s", s)
     elif data_type_name == "number":
         return struct.pack("d", float(value))
+    elif data_type_name == "time":
+        return struct.pack("i", int(value))
     return None
 
 def fromBinary(binary_value, data_type_name):
@@ -41,7 +44,11 @@ def fromBinary(binary_value, data_type_name):
         except json.JSONDecodeError:
             logger.error("FAILED to convert binary color payload : JSON provided by the user nay be in the wrong format : {}".format(rep))
         return rep
+    
+    elif data_type_name == "time":
+        return datetime.datetime.fromtimestamp(struct.unpack("i", binary_value)[0])
 
     elif data_type_name == "number":
         return struct.unpack("d", binary_value)[0]
+    
     return None
