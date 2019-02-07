@@ -422,7 +422,7 @@ class DetailedScenarii(APIView):
                 try:
                     scenario_serialized["conditions"] += condition_serialized
                 except KeyError:
-                    scenario_serialized["conditions"] = condition_serialized
+                    scenario_serialized["conditions"] = [condition_serialized]
 
             ret_val += [scenario_serialized]
 
