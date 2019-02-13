@@ -5,3 +5,34 @@ services:
     extends:
       file: mysql.yml
       service: db
+  alfred-brain:
+    image: clement26695/alfred-brain
+    command: ["bash", "./entrypoint.sh"]
+    environment:
+      DB_NAME: alfredbrain
+      DB_USER: root
+      DB_HOST: db
+      DB_PORT: 3306
+      SUPER_USER_NAME: alfred
+      SUPER_USER_EMAIL: alfred@localhost.com
+      SUPER_USER_PASS: alfred
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    links:
+      - db
+  alfred-face:
+    image: clement26695/alfred-face
+    ports:
+      - 5000:5000
+  chiros-lamp:
+    image: clement26695/chiros-lamp
+    command: python lamp-test.py 9800
+    ports:
+      - 9800:9800
+  chiros-thermometer:
+    image: clement26695/chiros-thermometer
+    command: python thermometer-test.py 9801
+    ports:
+      - 9801:9801

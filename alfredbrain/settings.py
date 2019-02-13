@@ -90,13 +90,15 @@ WSGI_APPLICATION = 'alfredbrain.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'alfredbrain',
-        'USER': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', 'alfredbrain'),
+        'USER': os.environ.get('DB_USER', 'root'),
+        'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+        'PASSWORD': os.environ.get('DB_PASS', ''),
+        'PORT': os.environ.get('DB_PORT', '3306'),
         'ATOMIC_REQUESTS': True
     }
 }
@@ -171,8 +173,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# CORS HEADER 
-CORS_ORIGIN_ALLOW_ALL = True   
+# CORS HEADER
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Use django nose to run tests
@@ -180,6 +182,6 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Specify coverage and packages
 NOSE_ARGS = [
-'--cover-erase', 
+'--cover-erase',
 '--cover-package=object_collector,object_collector.models',
 ]

@@ -1,0 +1,11 @@
+.vscode
+.idea
+.circleci
+__pycache__
+venv
+docker/**
+
+
+.gitignore
+swagger.json
+
