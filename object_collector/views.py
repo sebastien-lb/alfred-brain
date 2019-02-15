@@ -199,6 +199,7 @@ class SaveDataPoint(APIView):
     # arg:
     # data_source_id: id of the data source
     # value: value of the dataPoint
+    # no_save: flag, if present, do not save the datapoint
     def post(self, request, format=None):
         data = request.data
         try:
@@ -220,6 +221,9 @@ class SaveDataPoint(APIView):
         data_point_serializer = DataPointSerializer(data=data_point)
         if data_point_serializer.is_valid():
             # binary values can not be saved with serializers
+            if "no_save" in data:
+                return Response("Data Point not Saved (No save flag)", status=status.HTTP_200_OK)
+            
             DataPoint.objects.create(data_source=data_source, value=binary_value)
             return Response("Data Point Saved", status=status.HTTP_201_CREATED)
 
