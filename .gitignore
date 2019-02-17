@@ -297,3 +297,6 @@ pip-selfcheck.json
 .history
 
 # End of https://www.gitignore.io/api/venv,python,django,pycharm,visualstudiocode
+
+# remove SmartObject server.json in smart object
+server.json
