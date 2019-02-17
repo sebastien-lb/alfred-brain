@@ -1,0 +1,12 @@
+.vscode
+.idea
+.circleci
+__pycache__
+venv
+docker
+!docker/entrypoint.sh
+
+
+.gitignore
+swagger.json
+
