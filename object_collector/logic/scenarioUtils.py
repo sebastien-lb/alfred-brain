@@ -3,6 +3,7 @@ from .actionUtils import performAction
 from .dataTypeConversion import fromBinary
 from .operatorUtils import compare
 
+import datetime
 import logging
 logger = logging.getLogger('django')
 
@@ -40,6 +41,9 @@ def testTriggerScenario(datasource_id, value):
 def validateCondition(condition, value):
     operator = condition.operator.name
     condition_value = fromBinary(condition.value, condition.data_source.data_type.name)
+
+    if isinstance(condition_value, datetime.date):
+        condition_value = condition_value.timestamp()
 
     logger.info("test condition with value %d and seuil at %d and operator %s" % (value, condition_value, operator))
     logger.info("Return %r" % (compare(operator, condition.data_source.data_type.name, value, condition_value)))

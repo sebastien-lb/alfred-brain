@@ -1,0 +1,14 @@
+{
+    "name": "Clock",
+    "type": "clock",
+    "actions": [],
+    "data-source": [
+        {
+            "name": "clock",
+            "description": "return the current time every 30s",
+            "endpoint": "/time",
+            "data-type": "time",
+            "data-polling-type": "ON_PUSH"
+        }
+    ]
+}
