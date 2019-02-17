@@ -7,7 +7,7 @@ You can find an example of the `config.json` file which will be return by the ob
 ## Launch Alfred with Docker
 
 ```
-git clone
+git clone https://github.com/clement26695/alfred-docker.git
 cd alfred-docker
 docker-compose up
 ```
