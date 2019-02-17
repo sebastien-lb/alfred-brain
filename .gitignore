@@ -1,6 +1,7 @@
 # DOCKER
 
 docker/volumes
+docker/bdd
 .idea/
 test-results.txt
 

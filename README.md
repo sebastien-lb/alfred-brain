@@ -18,6 +18,9 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
+You can access the interface at `localhost:5000`. To log in you need to use the default test account: login: alfred, paswd: alfred.
+You can also add the SmartObjects with their ip and port (see below for their configurations). NB: ip is really `chiros-lamp` (due to docker local network). 
+
 #### Smart objects
 
 Three objects are launched by Docker. Their ip and port are the following:
@@ -73,8 +76,9 @@ python3 manage.py migrate
 
 __Start App__
 ```
-python3 manage.py runserver
+HOST_IP=<YOUR_IP> python3 manage.py runserver
 ```
+Replace `<YOUR_IP>` by your real ip. 
 
 __Test with Postman__
 ```
