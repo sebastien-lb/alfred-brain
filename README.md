@@ -61,6 +61,11 @@ cd docker
 docker-compose up
 ```
 
+__Create superuser__
+```
+python3 manage.py createsuperuser
+```
+
 __Apply migrations__
 ```
 python3 manage.py migrate
