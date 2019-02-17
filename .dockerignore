@@ -3,7 +3,8 @@
 .circleci
 __pycache__
 venv
-docker/**
+docker
+!docker/entrypoint.sh
 
 
 .gitignore

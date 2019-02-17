@@ -13,6 +13,7 @@ services:
       DB_USER: root
       DB_HOST: db
       DB_PORT: 3306
+      HOST_IP: alfred-brain
       SUPER_USER_NAME: alfred
       SUPER_USER_EMAIL: alfred@localhost.com
       SUPER_USER_PASS: alfred
@@ -29,10 +30,21 @@ services:
   chiros-lamp:
     image: clement26695/chiros-lamp
     command: python lamp-test.py 9800
+    volumes:
+      - ./volumes/chiros-lamp/server:/code/server
     ports:
       - 9800:9800
   chiros-thermometer:
     image: clement26695/chiros-thermometer
     command: python thermometer-test.py 9801
+    volumes:
+      - ./volumes/chiros-thermometer/server:/code/server
     ports:
       - 9801:9801
+  chiros-rgb-led:
+    image: clement26695/chiros-rgb-led
+    command: python smartled.py 9802
+    volumes:
+      - ./volumes/chiros-rgb-led/server:/code/server
+    ports:
+      - 9802:9802
