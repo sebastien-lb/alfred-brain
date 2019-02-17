@@ -18,6 +18,32 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
+#### Smart objects
+
+Three objects are launched by Docker. Their ip and port are the following:
+
+__Lamp__
+```json
+{
+  "ip": chiros-lamp,
+  "port": 9800
+}
+```
+__Thermometer__
+```json
+{
+  "ip": chiros-thermometer,
+  "port": 9801
+}
+```
+__RGB LED__
+```json
+{
+  "ip": chiros-rgb-led,
+  "port": 9802
+}
+```
+
 ## Launch alfred-brain without Docker
 
 __Project Setup__
