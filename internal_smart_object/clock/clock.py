@@ -28,6 +28,7 @@ def send_status():
         server = json.loads(file.read())
         data["data_source_id"] = server["data-source-ids"]["clock"]
 
+    data["no_save"] = 1
     requests.post("http://" + server["url"] + ":" + server["port"] + "/saveDataPoint", data=json.dumps(data),
                   headers={'Content-type': 'application/json'})
 
