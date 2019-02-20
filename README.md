@@ -76,7 +76,7 @@ python3 manage.py migrate
 
 __Start App__
 ```
-HOST_IP=<YOUR_IP> python3 manage.py runserver
+HOST_IP=<YOUR_IP> python3 manage.py runserver 0.0.0.0:8000
 ```
 Replace `<YOUR_IP>` by your real ip. 
 
