@@ -60,13 +60,9 @@ if python3 --version >/dev/null 2>&1 ; then
     echo "python3 found"
     echo "python3: $(python3 --version)"
 else
-    echo "python3 not found, trying python"
-    if python --version > /dev/null 2>&1 ; then
-        echo "python found"
-        echo "python: $(python --version)"
-    else 
-        echo "python not found"
-    fi
+    echo "python3 not found, installing it"
+    sudo apt-get install -y python3
+    echo "python3: $(python3 --version)"
 fi 
 
 install_deps() {
