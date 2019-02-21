@@ -42,7 +42,7 @@ echo installing repo deps
 cd $FACE_FOLDER 
 npm install
 cd ..
-cd $BRAIN_FOLDER
+cd ../$BRAIN_FOLDER
 python -m venv .
 source ./bin/activate
 pip install r requirements.txt
