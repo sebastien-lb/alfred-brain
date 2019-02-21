@@ -44,7 +44,7 @@ npm install
 cd ..
 cd ../$BRAIN_FOLDER
 python -m venv venv
-source ./bin/activate
+source venv/bin/activate
 pip install r requirements.txt
 
 
