@@ -62,6 +62,7 @@ if python3 --version >/dev/null 2>&1 ; then
 else
     echo "python3 not found, installing it"
     sudo apt-get install -y python3
+    sudo apt-get install python-virtualenv
     echo "python3: $(python3 --version)"
 fi 
 
@@ -70,8 +71,8 @@ install_deps() {
     cd $FACE_FOLDER
     npm install
     cd ../$BRAIN_FOLDER
-    python3 -m venv venv
-    source venv/bin/activate
+    virtualenv --python=/usr/bin/python3 venv
+    source ./venv/bin/activate
     pip install -r requirements.txt
     deactivate
     cd ..
