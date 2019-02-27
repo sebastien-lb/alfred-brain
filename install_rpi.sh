@@ -52,6 +52,7 @@ else
     echo "nodejs not found, installing it"
     curl -sL https://deb.nodesource.com/setup_11.x | sudo -E bash -
     sudo apt install -y nodejs
+    sudo apt install xsel
     echo "version: $(node --version)"
 
 fi 
@@ -62,20 +63,32 @@ if python3 --version >/dev/null 2>&1 ; then
 else
     echo "python3 not found, installing it"
     sudo apt-get install -y python3
+    apt install -y libmysqlclient-dev
     sudo apt-get install python-virtualenv
     echo "python3: $(python3 --version)"
 fi 
 
 install_deps() {
+    set_up_bdd()
     echo "installing repo deps"
     cd $FACE_FOLDER
     npm install
+    npm build
     cd ../$BRAIN_FOLDER
     virtualenv --python=/usr/bin/python3 venv
     source ./venv/bin/activate
+    pip install --upgrade setuptools
     pip install -r requirements.txt
+    python manage.py migrate
     deactivate
     cd ..
+}
+
+set_up_bdd() {
+    echo "Setting up bdd, not implementing yet"
+    # follow
+    # https://www.a2hosting.com/kb/developer-corner/mysql/managing-mysql-databases-and-users-from-the-command-line
+    # add password to django conf
 }
     
 
